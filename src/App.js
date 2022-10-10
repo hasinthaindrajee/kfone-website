@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import BusinessPlansSection from './layouts/BusinessPlansSection';
+import DealsSection from './layouts/DealsSection';
+import EntertainmentSection from './layouts/EntertainmentSection';
+import Footer from './layouts/Footer';
+import Hero from './layouts/Hero';
+import Navbar from './layouts/Navbar';
+import QuickActionsSection from './layouts/QuickActionsSection';
+import UnlimitedPlansSection from './layouts/UnlimitedPlansSection';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="font-body">
+      <Navbar />
+      <Hero />
+      <QuickActionsSection />
+      <DealsSection />
+      <UnlimitedPlansSection />
+      <BusinessPlansSection />
+      <EntertainmentSection />
+      <Footer />
     </div>
   );
-}
+};
 
 export default App;
