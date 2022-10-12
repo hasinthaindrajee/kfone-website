@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import { FaUserAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { AiOutlineLogin } from 'react-icons/ai';
 import { HiMenuAlt3 } from 'react-icons/hi';
 import { GiCrossedAirFlows } from 'react-icons/gi';
 import { GrClose } from 'react-icons/gr';
 import RoundedIconButton from '../components/buttons/RoundedIconButton';
 
-const Navbar = () => {
+const Navbar = (props) => {
+  const { handleLogin, state } = props;
+
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  useEffect(() => {
+    console.log(state);
+  }, [state.isAuthenticated]);
 
   const handleNavMenuButton = () => {
     setMobileNavOpen(!mobileNavOpen);
@@ -28,7 +34,7 @@ const Navbar = () => {
       </div>
       <ul className="flex justify-end items-center">
         <li className="px-4">
-          <RoundedIconButton icon={<FaUserAlt />} text="hello" />
+          <RoundedIconButton handleLogin={handleLogin} icon={<AiOutlineLogin />} text="Sign in" />
         </li>
         <li onClick={handleNavMenuButton} className="text-secondary block md:hidden">
           {mobileNavOpen ? <GrClose size={24} /> : <HiMenuAlt3 size={24} />}

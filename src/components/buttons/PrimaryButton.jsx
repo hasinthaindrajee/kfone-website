@@ -5,7 +5,7 @@ const PrimaryButton = (props) => {
 
   return (
     <button
-      className="transition ease-in-out duration-300 rounded-xl p-4 bg-primary text-light hover:bg-secondary-600 flex items-center justify-between"
+      className="transition ease-in-out duration-300 rounded-lg p-4 bg-primary text-light hover:bg-secondary-600 flex items-center justify-between"
       onClick={onClick}>
       {startIcon}
       {text}

@@ -6,7 +6,7 @@ import QuickActionCard from '../components/cards/QuickActionCard';
 const QuickActionsSection = () => {
   return (
     <section className="flex justify-center mx-2 mb-[-48px] relative">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center bg-secondary rounded-2xl text-center text-white p-4 w-full md:w-[75%]">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center bg-secondary rounded-lg text-center text-white p-4 w-full md:w-[75%]">
         <QuickActionCard>
           <BsPhone size={30} />
           <p>Phones & devices</p>

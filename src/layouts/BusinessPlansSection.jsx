@@ -9,7 +9,7 @@ import { MdOutlineDevices } from 'react-icons/md';
 
 const IconPill = ({ icon, text }) => {
   return (
-    <div className="grid grid-cols-3 gap-2 items-center justify-between border text-light border-secondary-50 rounded-2xl p-4 hover:shadow-sm hover:shadow-light h-full">
+    <div className="grid grid-cols-3 gap-2 items-center justify-between border text-light border-secondary-50 rounded-lg p-4 hover:shadow-sm hover:shadow-light h-full">
       <div className="mr-4">{icon}</div>
       <div className="font-light text-left col-span-2">
         <h2>{text}</h2>

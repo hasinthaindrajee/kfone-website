@@ -1,6 +1,6 @@
 import React from 'react';
 import iphone_14_1 from '../assets/images/devices/iphone_14_1.jpg';
-import pixel_6 from '../assets/images/devices/pixel_6.jpg';
+import pixel_7 from '../assets/images/devices/pixel_7.webp';
 import VerticalCard from '../components/cards/VerticalCard';
 import HeaderTitle from '../components/headers/HeaderTitle';
 
@@ -25,19 +25,19 @@ const DealsSection = () => {
             See offer details
           </a>
         }
-        styles="text-white bg-black rounded-2xl m-4 shadow-slate-600 shadow-lg transition ease-in-out delay-150 hover:scale-105 duration-300"
+        styles="text-white bg-black rounded-lg m-4 shadow-slate-600 shadow-lg transition ease-in-out delay-150 hover:scale-105 duration-300"
       />
       <VerticalCard
-        title="Pixel 6"
-        subTitle="Uniquely yours."
-        image={pixel_6}
-        description="Learn how new and existing customers get up to $300 off with eligible trade-in."
+        title="Pixel 7 & Pixel 7 Pro"
+        subTitle="Google's most advanced phones yet."
+        image={pixel_7}
+        description="Get up to $750 off any Pixel 7 phone with qualifying trade-in."
         action={
           <a className="font-extralight text-xs underline text-secondary-600" href="/">
-            See offer details
+            Learn more
           </a>
         }
-        styles="text-black bg-white rounded-2xl m-4 shadow-brown-300 shadow-lg transition ease-in-out delay-150 hover:scale-105 duration-300"
+        styles="text-black bg-[#E9E3DB] rounded-lg m-4 shadow-brown-300 shadow-lg transition ease-in-out delay-150 hover:scale-105 duration-300"
       />
     </div>
   );

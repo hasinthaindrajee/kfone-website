@@ -10,7 +10,7 @@ import background_waves from '../assets/images/background-waves.svg';
 const OverlayCard = ({ image, header, subHeader, description }) => {
   return (
     <div
-      className="flex flex-col items-center justify-between py-5 h-80 md:h-[360px] bg-secondary-800 rounded-xl shadow-secondary-500 shadow-md delay-150 hover:scale-105 duration-300 text-white bg-blend-overlay transition ease-in-out hover:bg-blend-exclusion bg-center bg-cover bg-no-repeat"
+      className="flex flex-col items-center justify-between py-5 h-80 md:h-[360px] bg-secondary-800 rounded-lg shadow-secondary-500 shadow-md delay-150 hover:scale-105 duration-300 text-white bg-blend-overlay transition ease-in-out hover:bg-blend-exclusion bg-center bg-cover bg-no-repeat"
       style={{ backgroundImage: `url(${image})` }}>
       <div className="text-center">
         <h1 className="font-light text-lg uppercase">{header}</h1>

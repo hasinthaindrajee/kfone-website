@@ -1,0 +1,13 @@
+{
+    "clientID": "tkIiux97G_KcoXMQ5m0_MXS3uNEa",
+    "baseUrl": "https://api.asgardeo.io/t/kfone",
+    "signInRedirectURL": "http://localhost:3000/my-kfone",
+    "signOutRedirectURL": "http://localhost:3000",
+    "scope": ["openid","profile"],
+    "stsConfig": {
+        "client_id": "",
+        "orgHandle": "",
+        "scope": []
+    },
+    "stsTokenEndpoint": ""
+}
