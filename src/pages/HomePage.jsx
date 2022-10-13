@@ -1,46 +1,54 @@
-import React, { useEffect } from 'react';
-import { useAuthContext, Hooks } from '@asgardeo/auth-react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useAuthContext } from '@asgardeo/auth-react';
+import { useLocation, useHistory } from 'react-router-dom';
 import BusinessPlansSection from '../layouts/BusinessPlansSection';
 import DealsSection from '../layouts/DealsSection';
 import EntertainmentSection from '../layouts/EntertainmentSection';
 import Hero from '../layouts/Hero';
 import QuickActionsSection from '../layouts/QuickActionsSection';
 import UnlimitedPlansSection from '../layouts/UnlimitedPlansSection';
-import WebPage from '../templates/WebPage';
+import GeneralTemplate from '../templates/GeneralTemplate';
 
 const HomePage = () => {
-  const { on, state, signIn } = useAuthContext();
+  const { state, signIn, getDecodedIDPIDToken } = useAuthContext();
+  const query = new URLSearchParams(useLocation().search);
+  const reRenderCheckRef = useRef(false);
   const history = useHistory();
 
   useEffect(() => {
-    console.log(sessionStorage.getItem('isAuth'));
-    if (sessionStorage.getItem('isAuth') !== null) {
+    reRenderCheckRef.current = true;
+
+    (async () => {
+      try {
+        const now = Math.floor(Date.now() / 1000);
+        const decodedIDtoken = await getDecodedIDPIDToken();
+        const expiration = decodedIDtoken?.exp;
+        if (now < expiration && !query.get('code')) {
+          await signIn();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+
+  const handleLogin = () => {
+    if (state?.isAuthenticated) {
       history.push('/my-kfone');
       return;
     }
-  }, []);
-
-  useEffect(() => {
-    on(Hooks.SignIn, () => {
-      history.push('/my-kfone');
-      sessionStorage.setItem('isAuth', true);
-    });
-  }, [on]);
-
-  const handleLogin = () => {
     signIn();
   };
 
   return (
-    <WebPage handleLogin={handleLogin} state={state}>
+    <GeneralTemplate handleLogin={handleLogin} state={state}>
       <Hero />
       <QuickActionsSection />
       <DealsSection />
       <UnlimitedPlansSection />
       <BusinessPlansSection />
       <EntertainmentSection />
-    </WebPage>
+    </GeneralTemplate>
   );
 };
 

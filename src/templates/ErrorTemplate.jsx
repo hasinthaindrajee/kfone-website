@@ -2,7 +2,7 @@ import React from 'react';
 import { BsArrowLeft } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 
-const Error = ({ children }) => {
+const ErrorTemplate = ({ children }) => {
   return (
     <div className="font-body flex flex-col justify-center items-center h-screen">
       {children}
@@ -16,4 +16,4 @@ const Error = ({ children }) => {
   );
 };
 
-export default Error;
+export default ErrorTemplate;

@@ -1,14 +1,15 @@
 import React from 'react';
 
 const PrimaryButton = (props) => {
-  const { startIcon, text, endIcon, onClick } = props;
+  const { startIcon, text, endIcon, onClick, styles, disabled } = props;
 
   return (
     <button
-      className="transition ease-in-out duration-300 rounded-lg p-4 bg-primary text-light hover:bg-secondary-600 flex items-center justify-between"
-      onClick={onClick}>
+      className={`transition ease-in-out duration-300 rounded-lg px-4 py-2 bg-primary text-light hover:bg-secondary-600 flex items-center ${styles}`}
+      onClick={onClick}
+      disabled={disabled}>
       {startIcon}
-      {text}
+      <h5>{text}</h5>
       {endIcon}
     </button>
   );

@@ -26,7 +26,7 @@ const OverlayCard = ({ image, header, subHeader, description }) => {
 const EntertainmentSection = () => {
   return (
     <section
-      className="mt-10 px-4 py-10"
+      className="mt-10 px-5 xl:px-20 py-10"
       style={{
         backgroundImage: `url(${background_waves})`
       }}>
