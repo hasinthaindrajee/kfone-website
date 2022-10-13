@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useAuthContext, Hooks } from '@asgardeo/auth-react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useAuthContext } from '@asgardeo/auth-react';
+import { useLocation, useHistory } from 'react-router-dom';
 import CustomerPortal from '../../templates/CustomerPortal';
 import { initiatePhoneVerify } from '../../api';
 import { BsBookmarkStar, BsCheck } from 'react-icons/bs';
@@ -13,7 +13,7 @@ const MyPlan = () => {
   const query = new URLSearchParams(location.search);
   const reRenderCheckRef = useRef(false);
   const {
-    on,
+    state,
     httpRequest,
     signIn,
     getBasicUserInfo,
@@ -45,39 +45,50 @@ const MyPlan = () => {
   }, []);
 
   useEffect(() => {
-    on(Hooks.SignIn, () => {
-      (async () => {
-        const basicUserInfo = await getBasicUserInfo();
-        const idToken = await getIDToken();
-        const decodedIDToken = await getDecodedIDToken();
+    if (!state?.isAuthenticated) {
+      return;
+    }
 
-        const derivedState = {
-          authenticateResponse: basicUserInfo,
-          idToken: idToken?.split('.'),
-          decodedIdTokenHeader: JSON.parse(atob(idToken?.split('.')[0])),
-          decodedIDTokenPayload: decodedIDToken
-        };
+    (async () => {
+      const basicUserInfo = await getBasicUserInfo();
+      const idToken = await getIDToken();
+      const decodedIDToken = await getDecodedIDToken();
 
-        console.log(derivedState);
-        setDecodedIDTokenPayload(decodedIDToken);
+      const derivedState = {
+        authenticateResponse: basicUserInfo,
+        idToken: idToken?.split('.'),
+        decodedIdTokenHeader: JSON.parse(atob(idToken?.split('.')[0])),
+        decodedIDTokenPayload: decodedIDToken
+      };
 
-        if (!decodedIDToken.mobileNumberVerified) {
-          handlePhoneVerification(
-            decodedIDToken.userid,
-            decodedIDToken.email,
-            decodedIDToken.phone_number
-          ).then(() => {
-            history.push('/my-kfone/verify', decodedIDToken);
-          });
-        }
-      })();
-    });
-  }, [on]);
+      if (decodedIDToken?.mobileNumberVerified) {
+        sessionStorage.setItem('verified', true);
+      }
+
+      console.log(derivedState);
+      setDecodedIDTokenPayload(decodedIDToken);
+    })();
+  }, [state.isAuthenticated]);
+
+  useEffect(() => {
+    if (!decodedIDTokenPayload) {
+      return;
+    }
+
+    if (!sessionStorage.getItem('verified')) {
+      handlePhoneVerification(
+        decodedIDTokenPayload.userid,
+        decodedIDTokenPayload.email,
+        decodedIDTokenPayload.phone_number
+      ).then(() => {
+        history.push('/my-kfone/verify', decodedIDTokenPayload);
+      });
+    }
+  }, [decodedIDTokenPayload]);
 
   const handlePhoneVerification = async (userid, email, phone_number) => {
     const res = await initiatePhoneVerify(userid, email, phone_number, httpRequest);
     sessionStorage.setItem('otp', res.otp);
-    history.push('/verify', { decodedIDToken: decodedIDTokenPayload });
   };
 
   return (

@@ -11,7 +11,7 @@ const PhoneVerification = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const reRenderCheckRef = useRef(false);
-  const { signIn, signOut, httpRequest, getDecodedIDPIDToken } = useAuthContext();
+  const { signIn, httpRequest, getDecodedIDPIDToken } = useAuthContext();
 
   const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
@@ -93,10 +93,8 @@ const PhoneVerification = () => {
       .then((res) => {
         console.log(res);
         setLoading(false);
-        signOut();
-        // signIn().then(() => {
-        //   window.location.replace('/my-kfone');
-        // });
+        sessionStorage.setItem('verified', true);
+        history.push('/my-kfone');
       })
       .catch((error) => {
         console.error(error);

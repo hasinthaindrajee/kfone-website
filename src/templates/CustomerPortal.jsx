@@ -18,7 +18,10 @@ const CustomerPortal = ({ children }) => {
   const { signOut } = useAuthContext();
 
   const handleLogout = () => {
-    signOut();
+    signOut().then(() => {
+      sessionStorage.removeItem('verified');
+      sessionStorage.removeItem('otp');
+    });
   };
 
   const NavLinkBlock = (props) => {
