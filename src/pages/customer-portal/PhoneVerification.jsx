@@ -2,15 +2,16 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@asgardeo/auth-react';
 import { GiCrossedAirFlows } from 'react-icons/gi';
-import PrimaryButton from '../components/buttons/PrimaryButton';
-import login_background from '../assets/images/people/login_background_overlay.jpeg';
+import PrimaryButton from '../../components/buttons/PrimaryButton';
+import login_background from '../../assets/images/people/login_background_overlay.jpeg';
+import { initiatePhoneVerify, verifyPhone } from '../../api';
 
 const PhoneVerification = () => {
   const history = useHistory();
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const reRenderCheckRef = useRef(false);
-  const { signIn, httpRequest, getDecodedIDPIDToken } = useAuthContext();
+  const { signIn, signOut, httpRequest, getDecodedIDPIDToken } = useAuthContext();
 
   const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
@@ -37,43 +38,26 @@ const PhoneVerification = () => {
   }, []);
 
   useEffect(() => {
-    console.log(location.state);
+    if (!location.state || !sessionStorage.getItem('otp')) {
+      history.push('/');
+      return;
+    }
+
     if (location.state) {
-      const { decodedIDToken } = location.state;
-      console.log(decodedIDToken);
+      const decodedIDToken = location.state;
+      if (decodedIDToken?.mobileNumberVerified) {
+        history.push('/my-kfone');
+      }
       setUserId(decodedIDToken?.userid);
       setEmail(decodedIDToken?.email);
       setPhone(decodedIDToken?.phone_number);
       return;
     }
-    // if (sessionStorage.getItem('otp') === null || sessionStorage.getItem('otp').length < 1) {
-    //   handleInitiate();
-    // }
   }, []);
 
   const handleInitiate = async () => {
-    const requestConfig = {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/scim+json'
-      },
-      method: 'POST',
-      data: {
-        userId: userId,
-        email: email,
-        mobile: phone
-      },
-      url: 'https://42807e1f-07ba-4fb0-a6d2-ecc7b41dd143-prod.e1-us-east-azure.choreoapis.dev/yphf/user-registration/1.0.0/initiate'
-    };
-
-    return httpRequest(requestConfig)
-      .then((response) => {
-        console.log(response);
-        sessionStorage.setItem('otp', response.data.otp);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const res = await initiatePhoneVerify(userId, email, phone, httpRequest);
+    sessionStorage.setItem('otp', res.otp);
   };
 
   const validateUserInput = (code) => {
@@ -105,25 +89,14 @@ const PhoneVerification = () => {
       }
     }, 3000);
 
-    const requestConfig = {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/scim+json'
-      },
-      method: 'POST',
-      data: {
-        userId: userId,
-        email: email,
-        mobile: phone
-      },
-      url: 'https://42807e1f-07ba-4fb0-a6d2-ecc7b41dd143-prod.e1-us-east-azure.choreoapis.dev/yphf/user-registration/1.0.0/verify'
-    };
-
-    return httpRequest(requestConfig)
-      .then((response) => {
-        console.log(response);
+    verifyPhone(userId, email, phone, httpRequest)
+      .then((res) => {
+        console.log(res);
         setLoading(false);
-        history.push('/my-kfone');
+        signOut();
+        // signIn().then(() => {
+        //   window.location.replace('/my-kfone');
+        // });
       })
       .catch((error) => {
         console.error(error);
@@ -144,11 +117,12 @@ const PhoneVerification = () => {
               <GiCrossedAirFlows size={60} />
             </h1>
           </div>
-          <h3 className="text-2xl my-3">Verify Phone</h3>
+          <h3 className="text-2xl my-3">Verify Your Mobile</h3>
           <div className="mt-4 w-[60%]">
             <div className="py-2 flex flex-col items-start w-full">
               <label className="mb-1 text-sm" htmlFor="otp">
-                Code is sent to the phone number ending with {phone.substring(phone.length - 4)}
+                We sent a verification code to your phone ending with&nbsp;
+                {phone.substring(phone.length - 4)}
               </label>
               <input
                 className="border border-secondary-100 rounded p-2 w-full focus-visible:outline-primary-50"

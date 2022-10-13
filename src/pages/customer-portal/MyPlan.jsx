@@ -55,24 +55,24 @@ const MyPlan = () => {
           decodedIDTokenPayload: decodedIDToken
         };
 
-        if (!decodedIDToken.mobileNumberVerified) {
-          await handlePhoneVerification();
-          history.push('/verify', decodedIDToken);
-        }
-
         console.log(derivedState);
         setDecodedIDTokenPayload(decodedIDToken);
+
+        if (!decodedIDToken.mobileNumberVerified) {
+          handlePhoneVerification(
+            decodedIDToken.userid,
+            decodedIDToken.email,
+            decodedIDToken.phone_number
+          ).then(() => {
+            history.push('/my-kfone/verify', decodedIDToken);
+          });
+        }
       })();
     });
   }, [on]);
 
-  const handlePhoneVerification = async () => {
-    const res = await initiatePhoneVerify(
-      decodedIDTokenPayload.userid,
-      decodedIDTokenPayload.email,
-      decodedIDTokenPayload.phone_number,
-      httpRequest
-    );
+  const handlePhoneVerification = async (userid, email, phone_number) => {
+    const res = await initiatePhoneVerify(userid, email, phone_number, httpRequest);
     sessionStorage.setItem('otp', res.otp);
     history.push('/verify', { decodedIDToken: decodedIDTokenPayload });
   };
