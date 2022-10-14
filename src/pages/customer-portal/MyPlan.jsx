@@ -1,48 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthContext } from '@asgardeo/auth-react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import CustomerPortal from '../../templates/CustomerPortal';
 import { initiatePhoneVerify } from '../../api';
 import { BsBookmarkStar, BsCheck } from 'react-icons/bs';
+import avatar from '../../assets/images/people/user.png';
 
 const currentYear = new Date().getFullYear();
 
 const MyPlan = () => {
   const history = useHistory();
-  const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const reRenderCheckRef = useRef(false);
-  const {
-    state,
-    httpRequest,
-    signIn,
-    getBasicUserInfo,
-    getIDToken,
-    getDecodedIDToken,
-    getDecodedIDPIDToken
-  } = useAuthContext();
+  const { state, httpRequest, getBasicUserInfo, getIDToken, getDecodedIDToken } = useAuthContext();
 
   const [decodedIDTokenPayload, setDecodedIDTokenPayload] = useState();
-
-  useEffect(() => {
-    reRenderCheckRef.current = true;
-
-    (async () => {
-      try {
-        const now = Math.floor(Date.now() / 1000);
-        const decodedIDtoken = await getDecodedIDPIDToken();
-        const expiration = decodedIDtoken?.exp;
-        if (now < expiration && !query.get('code')) {
-          await signIn();
-        }
-      } catch (error) {
-        console.log(error);
-        if (error?.code === 'SPA-AUTH_CLIENT-VM-IV02' && !query.get('code')) {
-          await signIn();
-        }
-      }
-    })();
-  }, []);
 
   useEffect(() => {
     if (!state?.isAuthenticated) {
@@ -77,7 +47,7 @@ const MyPlan = () => {
 
     if (!sessionStorage.getItem('verified')) {
       handlePhoneVerification(
-        decodedIDTokenPayload.userid,
+        decodedIDTokenPayload.userid || decodedIDTokenPayload.sub,
         decodedIDTokenPayload.email,
         decodedIDTokenPayload.phone_number
       ).then(() => {
@@ -95,22 +65,20 @@ const MyPlan = () => {
     <CustomerPortal>
       <section className="flex flex-col items-start justify-start">
         <div className="flex items-center justify-end w-full">
-          <div className="flex flex-col items-center justify-center bg-primary-100 p-4 mx-2 rounded-full h-20 w-20 shadow">
-            <h1 className="text-light font-semibold text-5xl uppercase">
-              {decodedIDTokenPayload?.username.substring(0, 1)}
-            </h1>
+          <div className="flex flex-col items-center justify-center mx-4 rounded-full h-[60px] w-[60px] shadow">
+            <img src={avatar} alt="user avatar" height={60} />
           </div>
           <div className="px-4 py-2 bg-light rounded-lg shadow">
-            <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.username}</h2>
+            <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.email}</h2>
             <h2 className="text-sm font-light text-primary-900">
               {decodedIDTokenPayload?.phone_number}
             </h2>
           </div>
         </div>
-        <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:gap-4 my-4">
           <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
             <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">My Plan</h3>
-            <div className="border rounded-lg p-4">
+            <div className="p-4">
               <h1 className="flex items-center font-light text-xl text-primary">
                 <BsBookmarkStar className="text-primary-200 mr-2" size={32} />
                 Kfone Emerald Plan
@@ -147,63 +115,18 @@ const MyPlan = () => {
               <tbody className="divide-y divide-gray-100">
                 <tr className="text-gray-500">
                   <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Data
+                    Additional data purchase
                   </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    5,649
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">30%</span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-cyan-600 h-2 rounded-sm"
-                            style={{ width: '30%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
                 </tr>
                 <tr className="text-gray-500">
                   <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Talk
+                    Buy data addons
                   </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    4,025
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">24%</span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-orange-300 h-2 rounded-sm"
-                            style={{ width: '24%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
                 </tr>
                 <tr className="text-gray-500">
                   <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Text
+                    Kfone Flex TV subscriptions
                   </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    3,105
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">18%</span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-teal-400 h-2 rounded-sm"
-                            style={{ width: '18%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
                 </tr>
               </tbody>
             </table>

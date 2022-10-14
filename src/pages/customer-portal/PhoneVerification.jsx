@@ -45,10 +45,10 @@ const PhoneVerification = () => {
 
     if (location.state) {
       const decodedIDToken = location.state;
-      if (decodedIDToken?.mobileNumberVerified) {
+      if (decodedIDToken?.mobileNumberVerified || sessionStorage.getItem('verified')) {
         history.push('/my-kfone');
       }
-      setUserId(decodedIDToken?.userid);
+      setUserId(decodedIDToken?.userid || decodedIDToken?.sub);
       setEmail(decodedIDToken?.email);
       setPhone(decodedIDToken?.phone_number);
       return;
