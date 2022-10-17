@@ -4,11 +4,14 @@ import { useHistory } from 'react-router-dom';
 import Loading from '../../layouts/Loading';
 import CustomerPortal from '../../templates/CustomerPortal';
 import { BsCheck } from 'react-icons/bs';
+import { IoMdAdd } from 'react-icons/io';
+import { IoExtensionPuzzleOutline, IoTvOutline } from 'react-icons/io5';
 import avatar from '../../assets/images/people/user.png';
 import { getUsageData } from '../../api';
 import { getMonthString } from '../../utils';
 
 const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth();
 
 const MyPlan = () => {
   const history = useHistory();
@@ -113,8 +116,8 @@ const MyPlan = () => {
                 </h2>
               </div>
             </div>
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:gap-4 my-4">
-              <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
+            <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
+              <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 mb-5 xl:mb-0">
                 <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">My Plan</h3>
                 <div className="p-4">
                   <div className="flex items-baseline font-light w-full">
@@ -290,7 +293,7 @@ const MyPlan = () => {
               </div>
             </div>
             <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
-              <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+              <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 mb-5 xl:mb-0">
                 <div className="mb-4 flex items-center justify-between">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Recent Payments</h3>
@@ -325,26 +328,26 @@ const MyPlan = () => {
                           <tbody className="bg-white">
                             <tr>
                               <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                                Aug 23 ,{currentYear}
+                                {getMonthString(currentMonth - 1)} 23 ,{currentYear}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                $590
+                                $55
                               </td>
                             </tr>
                             <tr className="bg-gray-50">
                               <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                                Jul 20 ,{currentYear}
+                                {getMonthString(currentMonth - 2)} 20 ,{currentYear}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                $2300
+                                $45
                               </td>
                             </tr>
                             <tr>
                               <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                                May 18 ,{currentYear}
+                                {getMonthString(currentMonth - 3)} 18 ,{currentYear}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                $234
+                                $50
                               </td>
                             </tr>
                           </tbody>
@@ -355,24 +358,36 @@ const MyPlan = () => {
                 </div>
               </div>
               <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
-                <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
+                <h3 className="text-xl leading-none font-bold text-gray-900 mb-4">
                   Buy Data Addons & Subscriptions
                 </h3>
                 <table className="items-center w-full bg-transparent border-collapse">
                   <tbody className="divide-y divide-gray-100">
                     <tr className="text-gray-500">
                       <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                        Additional data purchase
+                        <a
+                          href="#"
+                          className="inline-flex items-center text-sm font-medium text-primary hover:underline rounded-lg p-2">
+                          <IoMdAdd size={24} className="mr-2" /> Additional data purchase
+                        </a>
                       </th>
                     </tr>
                     <tr className="text-gray-500">
                       <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                        Buy data addons
+                        <a
+                          href="#"
+                          className="inline-flex items-center text-sm font-medium text-primary hover:underline rounded-lg p-2">
+                          <IoExtensionPuzzleOutline size={24} className="mr-2" /> Buy data addons
+                        </a>
                       </th>
                     </tr>
                     <tr className="text-gray-500">
                       <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                        Kfone Flex TV subscriptions
+                        <a
+                          href="#"
+                          className="inline-flex items-center text-sm font-medium text-primary hover:underline rounded-lg p-2">
+                          <IoTvOutline size={24} className="mr-2" /> Kfone Flex TV subscriptions
+                        </a>
                       </th>
                     </tr>
                   </tbody>
