@@ -6,7 +6,6 @@ import CustomerPortal from '../../templates/CustomerPortal';
 import { BsCheck } from 'react-icons/bs';
 import { IoMdAdd } from 'react-icons/io';
 import { IoExtensionPuzzleOutline, IoTvOutline } from 'react-icons/io5';
-import avatar from '../../assets/images/people/user.png';
 import { getUsageData } from '../../api';
 import { getMonthString } from '../../utils';
 
@@ -105,17 +104,6 @@ const MyPlan = () => {
       ) : (
         <CustomerPortal>
           <section className="flex flex-col items-start justify-start">
-            <div className="flex items-center justify-end w-full">
-              <div className="flex flex-col items-center justify-center mx-4 rounded-full h-[60px] w-[60px] shadow">
-                <img src={avatar} alt="user avatar" height={60} />
-              </div>
-              <div className="px-4 py-2 bg-light rounded-lg shadow">
-                <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.email}</h2>
-                <h2 className="text-sm font-light text-primary-900">
-                  {decodedIDTokenPayload?.phone_number}
-                </h2>
-              </div>
-            </div>
             <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
               <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 mb-5 xl:mb-0">
                 <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">My Plan</h3>
