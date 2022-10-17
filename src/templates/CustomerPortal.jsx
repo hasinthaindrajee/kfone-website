@@ -138,7 +138,7 @@ const CustomerPortal = ({ children }) => {
               </button>
             </NavLinkBlock>
           </nav>
-          <main className="ml-[300px] my-4 px-4 bg-white overflow-y-auto">{children}</main>
+          <main className="ml-[300px] overflow-y-auto bg-gray-100 p-4">{children}</main>
         </div>
       ) : (
         <Loading />

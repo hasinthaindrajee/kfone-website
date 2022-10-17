@@ -25,3 +25,7 @@ html {
 .PhoneInput > input:focus-visible {
   outline-color: #ff9f9f;
 }
+
+a:hover {
+  cursor: pointer;
+}

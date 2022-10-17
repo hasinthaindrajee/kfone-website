@@ -7,7 +7,7 @@ import HomePage from './pages/HomePage';
 import PhoneVerification from './pages/customer-portal/PhoneVerification';
 import NotFoundErrorPage from './pages/404';
 import MyPlan from './pages/customer-portal/MyPlan';
-import Discover from './pages/customer-portal/Explore';
+import Discover from './pages/customer-portal/explore/Explore';
 
 const App = () => {
   return (

@@ -115,3 +115,32 @@ export async function getUsageData(userId, httpRequest) {
       return mockData;
     });
 }
+
+export const recordUserInteractions = (email, interactions, httpRequest) => {
+  const { smartPhoneVisits, iotDevicesVisits, mobileSubscriptionVisits, tvSubscriptionVisits } =
+    interactions;
+
+  const requestConfig = {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    data: {
+      email: email,
+      smartPhoneVisits: smartPhoneVisits ?? 0,
+      iotDevicesVisits: iotDevicesVisits ?? 0,
+      mobileSubscriptionVisits: mobileSubscriptionVisits ?? 0,
+      tvSubscriptionVisits: tvSubscriptionVisits ?? 0
+    },
+    url: `${BASE_URL}/yphf/user-interactions-api/1.0.0/interactions`
+  };
+
+  return httpRequest(requestConfig)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
