@@ -51,10 +51,9 @@ const CustomerPortal = ({ children }) => {
   }, [state.isAuthenticated]);
 
   const handleLogout = () => {
-    signOut().then(() => {
-      sessionStorage.removeItem('verified');
-      sessionStorage.removeItem('otp');
-    });
+    sessionStorage.removeItem('verified');
+    sessionStorage.removeItem('otp');
+    signOut();
   };
 
   const NavLinkBlock = (props) => {
