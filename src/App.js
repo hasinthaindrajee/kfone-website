@@ -2,17 +2,17 @@ import React from 'react';
 import { AuthProvider } from '@asgardeo/auth-react';
 import { TokenExchangePlugin } from '@asgardeo/token-exchange-plugin';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { default as authConfig } from './config.json';
+import Config from './config.json';
 import HomePage from './pages/HomePage';
 import PhoneVerification from './pages/customer-portal/PhoneVerification';
 import NotFoundErrorPage from './pages/404';
 import MyPlan from './pages/customer-portal/MyPlan';
-import Discover from './pages/customer-portal/Explore';
+import Discover from './pages/customer-portal/explore/Explore';
 
 const App = () => {
   return (
     <AuthProvider
-      config={{ ...authConfig, storage: Storage.WebWorker }}
+      config={{ ...Config.auth, storage: Storage.WebWorker }}
       plugin={TokenExchangePlugin.getInstance()}>
       <Router>
         <Switch>
