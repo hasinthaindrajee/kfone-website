@@ -136,11 +136,31 @@ export const recordUserInteractions = (email, interactions, httpRequest) => {
     url: `${BASE_URL}/yphf/user-interactions-api/1.0.0/interactions`
   };
 
+  return httpRequest(requestConfig);
+};
+
+export const getPackageRecommendation = (userId, httpRequest) => {
+  const requestConfig = {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'GET',
+    params: {
+      userId: userId
+    },
+    url: `${BASE_URL}/yphf/usage-data-api/1.0.0/packageRecommendation`
+  };
+
   return httpRequest(requestConfig)
     .then((response) => {
-      console.log(response);
+      if (response?.data?.status !== 'Recommendation Found') {
+        throw 'Recommendation Not Found';
+      }
+
+      return response.data;
     })
     .catch((error) => {
-      console.error(error);
+      throw error;
     });
 };
