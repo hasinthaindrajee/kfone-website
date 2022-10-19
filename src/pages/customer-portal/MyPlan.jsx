@@ -333,10 +333,14 @@ const MyPlan = () => {
                       <div className="flex items-center">
                         <span className="mr-2 text-xs font-medium">
                           {currentUsage?.freeCallMinutes !== 0
-                            ? ((currentPlan?.freeCallMinutes -
-                                currentUsage?.allocatedMinutesUsage) /
-                                currentPlan?.freeCallMinutes) *
-                              100
+                            ? Number(
+                                (
+                                  ((currentPlan?.freeCallMinutes -
+                                    currentUsage?.allocatedMinutesUsage) /
+                                    currentPlan?.freeCallMinutes) *
+                                  100
+                                ).toFixed()
+                              )
                             : 0}
                           %
                         </span>
@@ -347,10 +351,14 @@ const MyPlan = () => {
                               style={{
                                 width: `${
                                   currentUsage?.freeCallMinutes !== 0
-                                    ? ((currentPlan?.freeCallMinutes -
-                                        currentUsage?.allocatedMinutesUsage) /
-                                        currentPlan?.freeCallMinutes) *
-                                      100
+                                    ? Number(
+                                        (
+                                          ((currentPlan?.freeCallMinutes -
+                                            currentUsage?.allocatedMinutesUsage) /
+                                            currentPlan?.freeCallMinutes) *
+                                          100
+                                        ).toFixed()
+                                      )
                                     : 0
                                 }%`
                               }}></div>
