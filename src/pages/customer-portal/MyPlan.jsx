@@ -239,14 +239,16 @@ const MyPlan = () => {
                     <div className="flex items-center">
                       <span className="mr-2 text-xs font-medium">
                         {currentUsage?.additionalPurchases?.length > 0
-                          ? Number(
-                              (
-                                ((currentUsage?.additionalPurchases[0]?.additionalData -
-                                  currentUsage?.additionalPurchases[0]?.additionalDataUsage) /
-                                  currentUsage?.additionalPurchases[0]?.additionalData) *
-                                100
-                              ).toFixed()
-                            )
+                          ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                            ? Number(
+                                (
+                                  ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                    currentUsage?.additionalPurchases[0]?.additionalDataUsage) /
+                                    currentUsage?.additionalPurchases[0]?.additionalData) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0
                           : 0}
                         %
                       </span>
@@ -257,15 +259,17 @@ const MyPlan = () => {
                             style={{
                               width: `${
                                 currentUsage?.additionalPurchases?.length > 0
-                                  ? Number(
-                                      (
-                                        ((currentUsage?.additionalPurchases[0]?.additionalData -
-                                          currentUsage?.additionalPurchases[0]
-                                            ?.additionalDataUsage) /
-                                          currentUsage?.additionalPurchases[0]?.additionalData) *
-                                        100
-                                      ).toFixed()
-                                    )
+                                  ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                                    ? Number(
+                                        (
+                                          ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                            currentUsage?.additionalPurchases[0]
+                                              ?.additionalDataUsage) /
+                                            currentUsage?.additionalPurchases[0]?.additionalData) *
+                                          100
+                                        ).toFixed()
+                                      )
+                                    : 0
                                   : 0
                               }%`
                             }}></div>
@@ -325,14 +329,16 @@ const MyPlan = () => {
                     <div className="flex items-center">
                       <span className="mr-2 text-xs font-medium">
                         {currentUsage?.additionalPurchases?.length > 0
-                          ? Number(
-                              (
-                                ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
-                                  currentUsage?.additionalPurchases[0]?.additionalMinutesUsage) /
-                                  currentUsage?.additionalPurchases[0]?.additionalMinutes) *
-                                100
-                              ).toFixed()
-                            )
+                          ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                            ? Number(
+                                (
+                                  ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
+                                    currentUsage?.additionalPurchases[0]?.additionalMinutesUsage) /
+                                    currentUsage?.additionalPurchases[0]?.additionalMinutes) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0
                           : 0}
                         %
                       </span>
@@ -343,15 +349,19 @@ const MyPlan = () => {
                             style={{
                               width: `${
                                 currentUsage?.additionalPurchases?.length > 0
-                                  ? Number(
-                                      (
-                                        ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
-                                          currentUsage?.additionalPurchases[0]
-                                            ?.additionalMinutesUsage) /
-                                          currentUsage?.additionalPurchases[0]?.additionalMinutes) *
-                                        100
-                                      ).toFixed()
-                                    )
+                                  ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                                    ? Number(
+                                        (
+                                          ((currentUsage?.additionalPurchases[0]
+                                            ?.additionalMinutes -
+                                            currentUsage?.additionalPurchases[0]
+                                              ?.additionalMinutesUsage) /
+                                            currentUsage?.additionalPurchases[0]
+                                              ?.additionalMinutes) *
+                                          100
+                                        ).toFixed()
+                                      )
+                                    : 0
                                   : 0
                               }%`
                             }}></div>
