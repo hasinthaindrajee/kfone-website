@@ -6,6 +6,7 @@ import { BsCheck } from 'react-icons/bs';
 import avatar from '../../assets/images/people/user.png';
 import { getUsageData, getPackageRecommendation } from '../../api';
 import { getMonthString } from '../../utils';
+import { SectionLoader as Loader } from './SectionLoader';
 
 const currentYear = new Date().getFullYear();
 
@@ -68,6 +69,32 @@ const MyPlan = () => {
         setUsage(data?.data?.usage);
         data?.data?.usage?.length > 0 &&
           setCurrentUsage(data?.data?.usage[data?.data?.usage?.length - 1]);
+      })
+      .catch(() => {
+        const data = {
+          userId: '4f833566-6758-4f5a-b43f-31d7d9b0b87f',
+          subscription: {
+            id: 2,
+            price: 120,
+            connectionType: 'postpaid',
+            freeCallMinutes: 150,
+            freeDataGB: 60,
+            name: 'Kfone Lite'
+          },
+          usage: [
+            {
+              month: 10,
+              year: 2022,
+              allocatedMinutesUsage: 0,
+              allocatedDataUsage: 0,
+              additionalPurchases: []
+            }
+          ]
+        };
+
+        setCurrentPlan(data?.subscription);
+        setUsage(data?.usage);
+        data?.usage?.length > 0 && setCurrentUsage(data?.usage[data?.usage?.length - 1]);
       })
       .finally(() => {
         setLoading(false);
@@ -143,37 +170,43 @@ const MyPlan = () => {
       <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:gap-4 my-4">
         <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
           <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">My Plan</h3>
-          <div className="p-4">
-            <div className="flex items-baseline font-light w-full">
-              <h1 className="text-4xl text-primary">{currentPlan?.name}</h1>
-              <h6 className="mx-2 py-1 px-2 bg-primary text-light rounded-lg text-[8px]">
-                {currentPlan?.connectionType}
-              </h6>
-            </div>
-            <table className="items-center bg-transparent border-collapse w-full">
-              <tbody className="divide-y divide-gray-100">
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    <BsCheck className="inline text-emerald-400 mr-2" size={24} />
-                    {currentPlan?.freeDataGB} GB, high speed anytime data
-                  </th>
-                </tr>
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    <BsCheck className="inline text-emerald-400 mr-2" size={24} />
-                    {currentPlan?.freeCallMinutes} minutes of standard national calls
-                  </th>
-                </tr>
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    <BsCheck className="inline text-emerald-400 mr-2" size={24} />
-                    Monthly plan charge {currency.format(currentPlan?.price)}
-                  </th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          {renderPlanRecommendation(recommendation)}
+          {currentPlan ? (
+            <>
+              <div className="p-4">
+                <div className="flex items-baseline font-light w-full">
+                  <h1 className="text-4xl text-primary">{currentPlan?.name}</h1>
+                  <h6 className="mx-2 py-1 px-2 bg-primary text-light rounded-lg text-[8px]">
+                    {currentPlan?.connectionType}
+                  </h6>
+                </div>
+                <table className="items-center bg-transparent border-collapse w-full">
+                  <tbody className="divide-y divide-gray-100">
+                    <tr className="text-gray-500">
+                      <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                        <BsCheck className="inline text-emerald-400 mr-2" size={24} />
+                        {currentPlan?.freeDataGB} GB, high speed anytime data
+                      </th>
+                    </tr>
+                    <tr className="text-gray-500">
+                      <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                        <BsCheck className="inline text-emerald-400 mr-2" size={24} />
+                        {currentPlan?.freeCallMinutes} minutes of standard national calls
+                      </th>
+                    </tr>
+                    <tr className="text-gray-500">
+                      <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                        <BsCheck className="inline text-emerald-400 mr-2" size={24} />
+                        Monthly plan charge {currency.format(currentPlan?.price)}
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {renderPlanRecommendation(recommendation)}
+            </>
+          ) : (
+            <Loader />
+          )}
         </div>
         <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
           <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
@@ -182,197 +215,215 @@ const MyPlan = () => {
               &nbsp; as of {new Date().toLocaleString('en-US')}
             </span>
           </h3>
-          <div className="block w-full overflow-x-auto">
-            <table className="items-center w-full bg-transparent border-collapse">
-              <tbody className="divide-y divide-gray-100">
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Data Bundle
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    {Number(currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage)} GB
-                    remaining
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">
-                        {Number(
-                          (
-                            ((currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage) /
-                              currentPlan?.freeDataGB) *
-                            100
-                          ).toFixed()
-                        )}
-                        %
-                      </span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-primary-100 h-2 rounded-sm"
-                            style={{
-                              width: `${Number(
+          {currentUsage ? (
+            <div className="block w-full overflow-x-auto">
+              <table className="items-center w-full bg-transparent border-collapse">
+                <tbody className="divide-y divide-gray-100">
+                  <tr className="text-gray-500">
+                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                      Data Bundle
+                    </th>
+                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
+                      {Number(currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage)} GB
+                      remaining
+                    </td>
+                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
+                      <div className="flex items-center">
+                        <span className="mr-2 text-xs font-medium">
+                          {currentPlan?.freeDataGB !== 0
+                            ? Number(
                                 (
                                   ((currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage) /
                                     currentPlan?.freeDataGB) *
                                   100
                                 ).toFixed()
-                              )}%`
-                            }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Additional Data
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    {currentUsage?.additionalPurchases?.length > 0
-                      ? currentUsage?.additionalPurchases[0].additionalData -
-                        currentUsage?.additionalPurchases[0].additionalDataUsage
-                      : 0}{' '}
-                    GB remaining
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">
-                        {currentUsage?.additionalPurchases?.length > 0
-                          ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
-                            ? Number(
-                                (
-                                  ((currentUsage?.additionalPurchases[0]?.additionalData -
-                                    currentUsage?.additionalPurchases[0]?.additionalDataUsage) /
-                                    currentUsage?.additionalPurchases[0]?.additionalData) *
-                                  100
-                                ).toFixed()
                               )
-                            : 0
-                          : 0}
-                        %
-                      </span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-primary-100 h-2 rounded-sm"
-                            style={{
-                              width: `${
-                                currentUsage?.additionalPurchases?.length > 0
-                                  ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                            : 0}
+                          %
+                        </span>
+                        <div className="relative w-full">
+                          <div className="w-full bg-gray-200 rounded-sm h-2">
+                            <div
+                              className="bg-primary-100 h-2 rounded-sm"
+                              style={{
+                                width: `${
+                                  currentPlan?.freeDataGB !== 0
                                     ? Number(
                                         (
-                                          ((currentUsage?.additionalPurchases[0]?.additionalData -
-                                            currentUsage?.additionalPurchases[0]
-                                              ?.additionalDataUsage) /
-                                            currentUsage?.additionalPurchases[0]?.additionalData) *
+                                          ((currentPlan?.freeDataGB -
+                                            currentUsage?.allocatedDataUsage) /
+                                            currentPlan?.freeDataGB) *
                                           100
                                         ).toFixed()
                                       )
                                     : 0
-                                  : 0
-                              }%`
-                            }}></div>
+                                }%`
+                              }}></div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+                  </tr>
 
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Talk Time
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    {`${
-                      currentPlan?.freeCallMinutes - currentUsage?.allocatedMinutesUsage
-                    } Mins remaining`}
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">
-                        {((currentPlan?.freeCallMinutes - currentUsage?.allocatedMinutesUsage) /
-                          currentUsage?.allocatedMinutesUsage) *
-                          100}
-                        %
-                      </span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-primary-100 h-2 rounded-sm"
-                            style={{
-                              width: `${
-                                ((currentPlan?.freeCallMinutes -
-                                  currentUsage?.allocatedMinutesUsage) /
-                                  currentUsage?.allocatedMinutesUsage) *
-                                100
-                              }%`
-                            }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Additional Talk Time
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    {currentUsage?.additionalPurchases?.length > 0
-                      ? currentUsage?.additionalPurchases[0].additionalMinutes -
-                        currentUsage?.additionalPurchases[0].additionalMinutesUsage
-                      : 0}{' '}
-                    Mins remaining
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">
-                        {currentUsage?.additionalPurchases?.length > 0
-                          ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
-                            ? Number(
-                                (
-                                  ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
-                                    currentUsage?.additionalPurchases[0]?.additionalMinutesUsage) /
-                                    currentUsage?.additionalPurchases[0]?.additionalMinutes) *
-                                  100
-                                ).toFixed()
-                              )
-                            : 0
-                          : 0}
-                        %
-                      </span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-primary-100 h-2 rounded-sm"
-                            style={{
-                              width: `${
-                                currentUsage?.additionalPurchases?.length > 0
-                                  ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
-                                    ? Number(
-                                        (
-                                          ((currentUsage?.additionalPurchases[0]
-                                            ?.additionalMinutes -
-                                            currentUsage?.additionalPurchases[0]
-                                              ?.additionalMinutesUsage) /
-                                            currentUsage?.additionalPurchases[0]
-                                              ?.additionalMinutes) *
-                                          100
-                                        ).toFixed()
-                                      )
+                  <tr className="text-gray-500">
+                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                      Additional Data
+                    </th>
+                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
+                      {currentUsage?.additionalPurchases?.length > 0
+                        ? currentUsage?.additionalPurchases[0].additionalData -
+                          currentUsage?.additionalPurchases[0].additionalDataUsage
+                        : 0}{' '}
+                      GB remaining
+                    </td>
+                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
+                      <div className="flex items-center">
+                        <span className="mr-2 text-xs font-medium">
+                          {currentUsage?.additionalPurchases?.length > 0
+                            ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                              ? Number(
+                                  (
+                                    ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                      currentUsage?.additionalPurchases[0]?.additionalDataUsage) /
+                                      currentUsage?.additionalPurchases[0]?.additionalData) *
+                                    100
+                                  ).toFixed()
+                                )
+                              : 0
+                            : 0}
+                          %
+                        </span>
+                        <div className="relative w-full">
+                          <div className="w-full bg-gray-200 rounded-sm h-2">
+                            <div
+                              className="bg-primary-100 h-2 rounded-sm"
+                              style={{
+                                width: `${
+                                  currentUsage?.additionalPurchases?.length > 0
+                                    ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                                      ? Number(
+                                          (
+                                            ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalDataUsage) /
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalData) *
+                                            100
+                                          ).toFixed()
+                                        )
+                                      : 0
                                     : 0
-                                  : 0
-                              }%`
-                            }}></div>
+                                }%`
+                              }}></div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                    </td>
+                  </tr>
+
+                  <tr className="text-gray-500">
+                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                      Talk Time
+                    </th>
+                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
+                      {`${
+                        currentPlan?.freeCallMinutes - currentUsage?.allocatedMinutesUsage
+                      } Mins remaining`}
+                    </td>
+                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
+                      <div className="flex items-center">
+                        <span className="mr-2 text-xs font-medium">
+                          {currentUsage?.freeCallMinutes !== 0
+                            ? ((currentPlan?.freeCallMinutes -
+                                currentUsage?.allocatedMinutesUsage) /
+                                currentPlan?.freeCallMinutes) *
+                              100
+                            : 0}
+                          %
+                        </span>
+                        <div className="relative w-full">
+                          <div className="w-full bg-gray-200 rounded-sm h-2">
+                            <div
+                              className="bg-primary-100 h-2 rounded-sm"
+                              style={{
+                                width: `${
+                                  currentUsage?.freeCallMinutes !== 0
+                                    ? ((currentPlan?.freeCallMinutes -
+                                        currentUsage?.allocatedMinutesUsage) /
+                                        currentPlan?.freeCallMinutes) *
+                                      100
+                                    : 0
+                                }%`
+                              }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr className="text-gray-500">
+                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                      Additional Talk Time
+                    </th>
+                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
+                      {currentUsage?.additionalPurchases?.length > 0
+                        ? currentUsage?.additionalPurchases[0].additionalMinutes -
+                          currentUsage?.additionalPurchases[0].additionalMinutesUsage
+                        : 0}{' '}
+                      Mins remaining
+                    </td>
+                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
+                      <div className="flex items-center">
+                        <span className="mr-2 text-xs font-medium">
+                          {currentUsage?.additionalPurchases?.length > 0
+                            ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                              ? Number(
+                                  (
+                                    ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
+                                      currentUsage?.additionalPurchases[0]
+                                        ?.additionalMinutesUsage) /
+                                      currentUsage?.additionalPurchases[0]?.additionalMinutes) *
+                                    100
+                                  ).toFixed()
+                                )
+                              : 0
+                            : 0}
+                          %
+                        </span>
+                        <div className="relative w-full">
+                          <div className="w-full bg-gray-200 rounded-sm h-2">
+                            <div
+                              className="bg-primary-100 h-2 rounded-sm"
+                              style={{
+                                width: `${
+                                  currentUsage?.additionalPurchases?.length > 0
+                                    ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                                      ? Number(
+                                          (
+                                            ((currentUsage?.additionalPurchases[0]
+                                              ?.additionalMinutes -
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalMinutesUsage) /
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalMinutes) *
+                                            100
+                                          ).toFixed()
+                                        )
+                                      : 0
+                                    : 0
+                                }%`
+                              }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <Loader />
+          )}
         </div>
       </div>
 
@@ -383,90 +434,94 @@ const MyPlan = () => {
               <h3 className="text-xl font-bold text-gray-900 mb-2">Usage History</h3>
             </div>
           </div>
-          <div className="flex flex-col mt-8">
-            <div className="overflow-x-auto rounded-lg">
-              <div className="align-middle inline-block min-w-full">
-                <div className="shadow overflow-hidden sm:rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th
-                          scope="col"
-                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Month
-                        </th>
-                        <th
-                          scope="col"
-                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Data Usage
-                        </th>
-                        <th
-                          scope="col"
-                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Talk Time Usage
-                        </th>
-                        <th
-                          scope="col"
-                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Additional Data Purchases
-                        </th>
-                        <th
-                          scope="col"
-                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Additional Talk Time Purchases
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white">
-                      {usage?.map((el, key) => (
-                        <tr key={key}>
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            {getMonthString(el?.month)}&nbsp;{el?.year}
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {el?.allocatedDataUsage} GB
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {el?.allocatedMinutesUsage} Mins
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {el?.additionalPurchases?.length > 0 ? (
-                              el?.additionalPurchases?.map((el2, subKey) => (
-                                <span
-                                  key={subKey}
-                                  className="bg-light rounded border border-secondary-50 inline-block p-1 mr-1">
-                                  {`${el2.additionalData} GB`}
-                                </span>
-                              ))
-                            ) : (
-                              <span>-</span>
-                            )}
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {el?.additionalPurchases?.length > 0 ? (
-                              el?.additionalPurchases?.map((el2, subKey) =>
-                                el2?.additionalMinutes === 0 ? (
-                                  <span>-</span>
-                                ) : (
+          {usage ? (
+            <div className="flex flex-col mt-8">
+              <div className="overflow-x-auto rounded-lg">
+                <div className="align-middle inline-block min-w-full">
+                  <div className="shadow overflow-hidden sm:rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Month
+                          </th>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Data Usage
+                          </th>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Talk Time Usage
+                          </th>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Additional Data Purchases
+                          </th>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Additional Talk Time Purchases
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white">
+                        {usage?.map((el, key) => (
+                          <tr key={key}>
+                            <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
+                              {getMonthString(el?.month)}&nbsp;{el?.year}
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.allocatedDataUsage} GB
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.allocatedMinutesUsage} Mins
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.additionalPurchases?.length > 0 ? (
+                                el?.additionalPurchases?.map((el2, subKey) => (
                                   <span
                                     key={subKey}
                                     className="bg-light rounded border border-secondary-50 inline-block p-1 mr-1">
-                                    {`${el2.additionalMinutes} Mins`}
+                                    {`${el2.additionalData} GB`}
                                   </span>
+                                ))
+                              ) : (
+                                <span>-</span>
+                              )}
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.additionalPurchases?.length > 0 ? (
+                                el?.additionalPurchases?.map((el2, subKey) =>
+                                  el2?.additionalMinutes === 0 ? (
+                                    <span>-</span>
+                                  ) : (
+                                    <span
+                                      key={subKey}
+                                      className="bg-light rounded border border-secondary-50 inline-block p-1 mr-1">
+                                      {`${el2.additionalMinutes} Mins`}
+                                    </span>
+                                  )
                                 )
-                              )
-                            ) : (
-                              <span>-</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                              ) : (
+                                <span>-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <Loader />
+          )}
         </div>
       </div>
       <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
