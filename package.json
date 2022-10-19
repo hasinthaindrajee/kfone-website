@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@asgardeo/auth-react": "^1.1.18",
-    "@asgardeo/token-exchange-plugin": "^0.1.5",
+    "@asgardeo/token-exchange-plugin": "^0.1.6",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
