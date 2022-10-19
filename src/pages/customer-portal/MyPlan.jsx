@@ -66,7 +66,7 @@ const MyPlan = () => {
     getUsageData(decodedIDTokenPayload?.userid || decodedIDTokenPayload?.sub, httpRequest)
       .then((data) => {
         setCurrentPlan(data?.data?.subscription);
-        setUsage(data?.data?.usage);
+        setUsage(data?.data?.usage?.reverse());
         data?.data?.usage?.length > 0 &&
           setCurrentUsage(data?.data?.usage[data?.data?.usage?.length - 1]);
       })
