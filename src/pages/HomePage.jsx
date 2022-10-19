@@ -10,7 +10,7 @@ import UnlimitedPlansSection from '../layouts/UnlimitedPlansSection';
 import GeneralTemplate from '../templates/GeneralTemplate';
 
 const HomePage = () => {
-  const { state, signIn, getDecodedIDPIDToken } = useAuthContext();
+  const { state, signIn, getDecodedIDPIDToken, trySignInSilently } = useAuthContext();
   const query = new URLSearchParams(useLocation().search);
   const reRenderCheckRef = useRef(false);
   const history = useHistory();
@@ -37,7 +37,16 @@ const HomePage = () => {
       history.push('/my-kfone');
       return;
     }
-    signIn();
+
+    trySignInSilently()
+      .then((response) => {
+        if (!response) {
+          signIn();
+        }
+      })
+      .catch(() => {
+        signIn();
+      });
   };
 
   return (

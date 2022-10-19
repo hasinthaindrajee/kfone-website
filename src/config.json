@@ -2,8 +2,8 @@
     "auth": {
         "clientID": "tkIiux97G_KcoXMQ5m0_MXS3uNEa",
         "baseUrl": "https://api.asgardeo.io/t/kfone",
-        "signInRedirectURL": "https://localhost:3001/my-kfone",
-        "signOutRedirectURL": "https://localhost:3001",
+        "signInRedirectURL": "https://kfone.life/my-kfone",
+        "signOutRedirectURL": "https://kfone.life",
         "scope": [
             "openid",
             "profile",
