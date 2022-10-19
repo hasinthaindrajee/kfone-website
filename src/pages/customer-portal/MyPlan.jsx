@@ -67,8 +67,7 @@ const MyPlan = () => {
       .then((data) => {
         setCurrentPlan(data?.data?.subscription);
         setUsage(data?.data?.usage?.reverse());
-        data?.data?.usage?.length > 0 &&
-          setCurrentUsage(data?.data?.usage[data?.data?.usage?.length - 1]);
+        data?.data?.usage?.length > 0 && setCurrentUsage(data?.data?.usage[0]);
       })
       .catch(() => {
         const data = {
