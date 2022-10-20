@@ -1,14 +1,34 @@
 import React from 'react';
-import { useAuthContext } from '@asgardeo/auth-react';
-import HomePageWithAuth from './HomePageWithAuth';
-import HomePageWithOutAuth from './HomePageWithOutAuth';
+import { useHistory } from 'react-router-dom';
+import BusinessPlansSection from '../layouts/BusinessPlansSection';
+import DealsSection from '../layouts/DealsSection';
+import EntertainmentSection from '../layouts/EntertainmentSection';
+import Hero from '../layouts/Hero';
+import QuickActionsSection from '../layouts/QuickActionsSection';
+import UnlimitedPlansSection from '../layouts/UnlimitedPlansSection';
+import GeneralTemplate from '../templates/GeneralTemplate';
 
 const HomePage = () => {
-  if (!useAuthContext()) {
-    return <HomePageWithOutAuth />;
-  }
+  const history = useHistory();
 
-  return <HomePageWithAuth />;
+  const handleLogin = () => {
+    navigateToPortal();
+  };
+
+  const navigateToPortal = () => {
+    history.push('/my-kfone');
+  };
+
+  return (
+    <GeneralTemplate handleLogin={handleLogin} state={null}>
+      <Hero />
+      <QuickActionsSection />
+      <DealsSection />
+      <UnlimitedPlansSection />
+      <BusinessPlansSection />
+      <EntertainmentSection />
+    </GeneralTemplate>
+  );
 };
 
 export default HomePage;
