@@ -1,23 +1,4 @@
-import { useRef } from 'react';
-import { useAuthContext } from '@asgardeo/auth-react';
-import { recordUserInteractions } from '../../../api';
-
 export const TVPlans = () => {
-  const { state, httpRequest } = useAuthContext();
-  const tvSubscriptionVisitsCounter = useRef(0);
-
-  const recordInteraction = () => {
-    tvSubscriptionVisitsCounter.current++;
-
-    recordUserInteractions(
-      state.email,
-      {
-        tvSubscriptionVisits: tvSubscriptionVisitsCounter.current
-      },
-      httpRequest
-    );
-  };
-
   return (
     <section>
       <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
@@ -71,9 +52,7 @@ export const TVPlans = () => {
                 </span>
               </li>
             </ul>
-            <a
-              onClick={recordInteraction}
-              className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900">
+            <a className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900">
               Get started
             </a>
           </div>
@@ -117,9 +96,7 @@ export const TVPlans = () => {
                 </span>
               </li>
             </ul>
-            <a
-              onClick={recordInteraction}
-              className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900">
+            <a className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900">
               Get started
             </a>
           </div>
@@ -163,9 +140,7 @@ export const TVPlans = () => {
                 </span>
               </li>
             </ul>
-            <a
-              onClick={recordInteraction}
-              className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900">
+            <a className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-primary-900">
               Get started
             </a>
           </div>

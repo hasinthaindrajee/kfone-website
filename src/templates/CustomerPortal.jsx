@@ -12,13 +12,10 @@ import {
 import { FiExternalLink } from 'react-icons/fi';
 import Config from '../config.json';
 
-const CustomerPortal = ({ children }) => {
+const CustomerPortal = (props) => {
+  const { children, handleLogout } = props;
   const location = useLocation();
   const history = useHistory();
-
-  const handleLogout = () => {
-    return;
-  };
 
   const NavLinkBlock = (props) => {
     const { children, url } = props;
@@ -55,18 +52,14 @@ const CustomerPortal = ({ children }) => {
               history.push('/my-kfone');
             }}
             className="flex w-full items-center">
-            <AiOutlineDashboard size={28} className="mr-3" />
-            <h3 className="mr-1">My Plan</h3>
-          </button>
-        </NavLinkBlock>
-        <NavLinkBlock url="/my-kfone/explore">
-          <button
-            onClick={() => {
-              history.push('/my-kfone/explore');
-            }}
-            className="flex w-full items-center">
             <AiOutlineAppstore size={28} className="mr-3" />
             <h3 className="mr-1">Explore</h3>
+          </button>
+        </NavLinkBlock>
+        <NavLinkBlock url="/my-kfone/my-plan">
+          <button className="flex w-full items-center">
+            <AiOutlineDashboard size={28} className="mr-3" />
+            <h3 className="mr-1">My Plan</h3>
           </button>
         </NavLinkBlock>
         <NavLinkBlock url="/my-kfone/billing">
