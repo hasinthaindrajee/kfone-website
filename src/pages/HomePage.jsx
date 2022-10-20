@@ -9,18 +9,15 @@ import UnlimitedPlansSection from '../layouts/UnlimitedPlansSection';
 import GeneralTemplate from '../templates/GeneralTemplate';
 
 const HomePage = () => {
-  const history = useHistory();
-
   const handleLogin = () => {
-    navigateToPortal();
-  };
-
-  const navigateToPortal = () => {
-    history.push('/my-kfone');
+    alert('Please add login');
   };
 
   return (
-    <GeneralTemplate handleLogin={handleLogin}>
+    <GeneralTemplate
+      handleLogin={() => {
+        handleLogin();
+      }}>
       <Hero />
       <QuickActionsSection />
       <DealsSection />

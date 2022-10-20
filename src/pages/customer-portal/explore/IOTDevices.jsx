@@ -1,15 +1,9 @@
-import { useRef } from 'react';
-import { useAuthContext } from '@asgardeo/auth-react';
-import { recordUserInteractions } from '../../../api';
 import AmazonAlexa from '../../../assets/images/explore/shop/amazon-alexa.png';
 import DLinkModem from '../../../assets/images/explore/shop/dlink-modem.png';
 import USBConnect from '../../../assets/images/explore/shop/usb-connectt.png';
 import SmartSwitch from '../../../assets/images/explore/shop/smart-switch.webp';
 
 export const IOTDevices = () => {
-  const { state, httpRequest } = useAuthContext();
-  const iotDeviceVisitsCounter = useRef(0);
-
   const devices = [
     {
       id: 1,
@@ -40,18 +34,6 @@ export const IOTDevices = () => {
       price: '59.99'
     }
   ];
-
-  const recordInteraction = () => {
-    iotDeviceVisitsCounter.current++;
-
-    recordUserInteractions(
-      state.email,
-      {
-        iotDevicesVisits: iotDeviceVisitsCounter.current
-      },
-      httpRequest
-    );
-  };
 
   return (
     <section>
@@ -91,9 +73,7 @@ export const IOTDevices = () => {
                     </div>
                   </div>
                   <div className="mt-5">
-                    <button
-                      onClick={recordInteraction}
-                      className="w-full px-6 py-2 transition ease-in duration-200 uppercase rounded-full hover:bg-gray-800 hover:text-white border-2 border-gray-900 focus:outline-none">
+                    <button className="w-full px-6 py-2 transition ease-in duration-200 uppercase rounded-full hover:bg-gray-800 hover:text-white border-2 border-gray-900 focus:outline-none">
                       See More
                     </button>
                   </div>

@@ -1,6 +1,3 @@
-import { useRef } from 'react';
-import { useAuthContext } from '@asgardeo/auth-react';
-import { recordUserInteractions } from '../../../api';
 import iPhone14ProMaxDeepPurple from '../../../assets/images/explore/shop/iphone-14-pro-max-deep-purple-feature1-m.jpeg';
 import SamsungGalaxyZFold45G from '../../../assets/images/explore/shop/samsung-galaxy-z-fold4-greygreen-01-m.jpeg';
 import GooglePixel7Pro from '../../../assets/images/explore/shop/google-pixel-7-pro-hazel-01-m.jpeg';
@@ -11,9 +8,6 @@ import MotorolaEdge from '../../../assets/images/explore/shop/motorola-edge-30-g
 import SamsungGalaxyA134G from '../../../assets/images/explore/shop/samsung-galaxy-a13-black-front-m.jpeg';
 
 export const Phones = () => {
-  const { state, httpRequest } = useAuthContext();
-  const mobileDeviceVisitsCounter = useRef(0);
-
   const phones = [
     {
       id: 1,
@@ -73,18 +67,6 @@ export const Phones = () => {
     }
   ];
 
-  const recordInteraction = () => {
-    mobileDeviceVisitsCounter.current++;
-
-    recordUserInteractions(
-      state.email,
-      {
-        smartPhoneVisits: mobileDeviceVisitsCounter.current
-      },
-      httpRequest
-    );
-  };
-
   return (
     <section>
       <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
@@ -122,9 +104,7 @@ export const Phones = () => {
                     </div>
                   </div>
                   <div className="mt-5">
-                    <button
-                      onClick={recordInteraction}
-                      className="w-full px-6 py-2 transition ease-in duration-200 uppercase rounded-full hover:bg-gray-800 hover:text-white border-2 border-gray-900 focus:outline-none">
+                    <button className="w-full px-6 py-2 transition ease-in duration-200 uppercase rounded-full hover:bg-gray-800 hover:text-white border-2 border-gray-900 focus:outline-none">
                       See More
                     </button>
                   </div>

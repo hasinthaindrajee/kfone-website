@@ -55,18 +55,14 @@ const CustomerPortal = ({ children }) => {
               history.push('/my-kfone');
             }}
             className="flex w-full items-center">
-            <AiOutlineDashboard size={28} className="mr-3" />
-            <h3 className="mr-1">My Plan</h3>
-          </button>
-        </NavLinkBlock>
-        <NavLinkBlock url="/my-kfone/explore">
-          <button
-            onClick={() => {
-              history.push('/my-kfone/explore');
-            }}
-            className="flex w-full items-center">
             <AiOutlineAppstore size={28} className="mr-3" />
             <h3 className="mr-1">Explore</h3>
+          </button>
+        </NavLinkBlock>
+        <NavLinkBlock url="/my-kfone/my-plan">
+          <button className="flex w-full items-center">
+            <AiOutlineDashboard size={28} className="mr-3" />
+            <h3 className="mr-1">My Plan</h3>
           </button>
         </NavLinkBlock>
         <NavLinkBlock url="/my-kfone/billing">
