@@ -4,6 +4,7 @@ import NavbarWithOutAuth from './NavbarWithOutAuth';
 import NavbarWithAuth from './NavbarWithAuth';
 
 const Navbar = (props) => {
+
   if (!useAuthContext()) {
     return <NavbarWithOutAuth {...props} />;
   }

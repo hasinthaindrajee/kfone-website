@@ -12,13 +12,10 @@ import {
 import { FiExternalLink } from 'react-icons/fi';
 import Config from '../config.json';
 
-const CustomerPortal = ({ children }) => {
+const CustomerPortal = (props) => {
+  const { children, handleLogout } = props;
   const location = useLocation();
   const history = useHistory();
-
-  const handleLogout = () => {
-    return;
-  };
 
   const NavLinkBlock = (props) => {
     const { children, url } = props;

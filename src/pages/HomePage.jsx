@@ -1,5 +1,4 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import BusinessPlansSection from '../layouts/BusinessPlansSection';
 import DealsSection from '../layouts/DealsSection';
 import EntertainmentSection from '../layouts/EntertainmentSection';
@@ -8,16 +7,9 @@ import QuickActionsSection from '../layouts/QuickActionsSection';
 import UnlimitedPlansSection from '../layouts/UnlimitedPlansSection';
 import GeneralTemplate from '../templates/GeneralTemplate';
 
-const HomePage = () => {
-  const handleLogin = () => {
-    alert('Please add login');
-  };
-
+const HomePage = (props) => {
   return (
-    <GeneralTemplate
-      handleLogin={() => {
-        handleLogin();
-      }}>
+    <GeneralTemplate {...props}>
       <Hero />
       <QuickActionsSection />
       <DealsSection />

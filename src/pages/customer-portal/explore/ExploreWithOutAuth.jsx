@@ -7,9 +7,9 @@ import { IOTDevices } from './IOTDevices';
 import { TVPlans } from './TVPlans';
 import avatar from '../../../assets/images/people/user.png';
 
-const ExploreWithAuthOutAuth = () => {
+const ExploreWithAuthOutAuth = (props) => {
   return (
-    <CustomerPortal>
+    <CustomerPortal {...props}>
       <div className="flex items-center justify-end w-full mb-5">
         <div className="flex flex-col items-center justify-center mx-4 rounded-full h-[60px] w-[60px] shadow">
           <img src={avatar} alt="user avatar" height={60} />

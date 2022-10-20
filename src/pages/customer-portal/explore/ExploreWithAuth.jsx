@@ -9,7 +9,7 @@ import { useAuthContext } from '@asgardeo/auth-react';
 import Loading from '../../../layouts/Loading';
 import avatar from '../../../assets/images/people/user.png';
 
-const ExploreWithAuth = () => {
+const ExploreWithAuth = (props) => {
   const { state, getDecodedIDToken } = useAuthContext();
 
   const [decodedIDTokenPayload, setDecodedIDTokenPayload] = useState();
@@ -30,7 +30,7 @@ const ExploreWithAuth = () => {
   }
 
   return (
-    <CustomerPortal>
+    <CustomerPortal {...props}>
       <div className="flex items-center justify-end w-full mb-5">
         <div className="flex flex-col items-center justify-center mx-4 rounded-full h-[60px] w-[60px] shadow">
           <img src={avatar} alt="user avatar" height={60} />

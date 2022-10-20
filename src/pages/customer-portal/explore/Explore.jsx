@@ -3,12 +3,12 @@ import { useAuthContext } from '@asgardeo/auth-react';
 import ExploreWithAuth from './ExploreWithAuth';
 import ExploreWithOutAuth from './ExploreWithOutAuth';
 
-const Explore = () => {
+const Explore = (props) => {
   if (!useAuthContext()) {
-    return <ExploreWithOutAuth />;
+    return <ExploreWithOutAuth {...props} />;
   }
 
-  return <ExploreWithAuth />;
+  return <ExploreWithAuth {...props} />;
 };
 
 export default Explore;
