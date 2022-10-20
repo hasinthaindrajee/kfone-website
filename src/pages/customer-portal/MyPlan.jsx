@@ -7,6 +7,7 @@ import avatar from '../../assets/images/people/user.png';
 import { getUsageData, getPackageRecommendation } from '../../api';
 import { getMonthString } from '../../utils';
 import { SectionLoader as Loader } from './SectionLoader';
+import Loading from '../../layouts/Loading';
 
 const currentYear = new Date().getFullYear();
 
@@ -19,6 +20,7 @@ const currency = new Intl.NumberFormat('en-US', {
 const MyPlan = () => {
   const history = useHistory();
   const { state, getBasicUserInfo, getIDToken, getDecodedIDToken, httpRequest } = useAuthContext();
+  const { isAuthenticated, isLoading } = state;
 
   const [loading, setLoading] = useState(true);
   const [currentPlan, setCurrentPlan] = useState();
@@ -623,6 +625,10 @@ const MyPlan = () => {
       </div>
     </>
   );
+
+  if (isLoading || !isAuthenticated) {
+    return <Loading />;
+  }
 
   return (
     <CustomerPortal>

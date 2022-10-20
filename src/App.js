@@ -12,9 +12,7 @@ import { SecureRouteWithRedirect } from './components';
 
 const App = () => {
   return (
-    <AuthProvider
-      config={{ ...Config.auth, storage: Storage.WebWorker }}
-      plugin={TokenExchangePlugin.getInstance()}>
+    <AuthProvider config={Config.auth} plugin={TokenExchangePlugin.getInstance()}>
       <Router>
         <Switch>
           <Route exact path="/" component={HomePage} />
