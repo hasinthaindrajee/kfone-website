@@ -20,7 +20,7 @@ const HomePage = () => {
   };
 
   return (
-    <GeneralTemplate handleLogin={handleLogin} state={null}>
+    <GeneralTemplate handleLogin={handleLogin}>
       <Hero />
       <QuickActionsSection />
       <DealsSection />
