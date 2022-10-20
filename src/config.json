@@ -2,8 +2,8 @@
     "auth": {
         "clientID": "tkIiux97G_KcoXMQ5m0_MXS3uNEa",
         "baseUrl": "https://api.asgardeo.io/t/kfone",
-        "signInRedirectURL": "https://kfone.life/my-kfone",
-        "signOutRedirectURL": "https://kfone.life",
+        "signInRedirectURL": "https://localhost:3001/my-kfone",
+        "signOutRedirectURL": "https://localhost:3001",
         "scope": [
             "openid",
             "profile",
@@ -23,6 +23,7 @@
                 "apim:api_generate_key"
             ]
         },
+        "storage": "webWorker",
         "stsTokenEndpoint": "https://sts.choreo.dev/oauth2/token",
         "resourceServerURLs": "https://42807e1f-07ba-4fb0-a6d2-ecc7b41dd143-prod.e1-us-east-azure.choreoapis.dev"
     },

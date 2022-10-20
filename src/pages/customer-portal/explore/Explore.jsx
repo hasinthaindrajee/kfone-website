@@ -1,21 +1,14 @@
 import React from 'react';
-import CustomerPortal from '../../../templates/CustomerPortal';
-import { Carousel } from './Carousel';
-import { MobilePlans } from './MobilePlans';
-import { Phones } from './Phones';
-import { IOTDevices } from './IOTDevices';
-import { TVPlans } from './TVPlans';
+import { useAuthContext } from '@asgardeo/auth-react';
+import ExploreWithAuth from './ExploreWithAuth';
+import ExploreWithOutAuth from './ExploreWithOutAuth';
 
 const Explore = () => {
-  return (
-    <CustomerPortal>
-      <Carousel />
-      <MobilePlans />
-      <Phones />
-      <TVPlans />
-      <IOTDevices />
-    </CustomerPortal>
-  );
+  if (!useAuthContext()) {
+    return <ExploreWithOutAuth />;
+  }
+
+  return <ExploreWithAuth />;
 };
 
 export default Explore;

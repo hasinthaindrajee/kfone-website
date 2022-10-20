@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuthContext } from '@asgardeo/auth-react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { GiCrossedAirFlows } from 'react-icons/gi';
 import {
@@ -11,19 +10,14 @@ import {
   AiOutlineCreditCard
 } from 'react-icons/ai';
 import { FiExternalLink } from 'react-icons/fi';
-import Loading from '../layouts/Loading';
 import Config from '../config.json';
 
 const CustomerPortal = ({ children }) => {
   const location = useLocation();
   const history = useHistory();
-  const { state, signOut } = useAuthContext();
-  const { isAuthenticated, isLoading } = state;
 
   const handleLogout = () => {
-    sessionStorage.removeItem('verified');
-    sessionStorage.removeItem('otp');
-    signOut();
+    return;
   };
 
   const NavLinkBlock = (props) => {
@@ -40,10 +34,6 @@ const CustomerPortal = ({ children }) => {
       </div>
     );
   };
-
-  if (isLoading || !isAuthenticated) {
-    return <Loading />;
-  }
 
   return (
     <div className="font-body">
@@ -101,13 +91,19 @@ const CustomerPortal = ({ children }) => {
           </a>
         </NavLinkBlock>
         <NavLinkBlock url="">
-          <button onClick={handleLogout} className="flex w-full items-center">
+          <button
+            onClick={() => {
+              sessionStorage.removeItem('verified');
+              sessionStorage.removeItem('otp');
+              handleLogout();
+            }}
+            className="flex w-full items-center">
             <AiOutlineLogout size={28} className="mr-3" />
             <h3 className="mr-1">Sign out</h3>
           </button>
         </NavLinkBlock>
       </nav>
-      <main className="ml-[300px] overflow-y-auto bg-gray-100 p-4">{children}</main>
+      <main className="ml-[300px] overflow-y-auto h-screen bg-gray-100 p-4">{children}</main>
     </div>
   );
 };
