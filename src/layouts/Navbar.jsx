@@ -9,9 +9,14 @@ const Navbar = (props) => {
   const { handleLogin, state } = props;
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [buttonText, setButtonText] = useState('Sign in');
 
   useEffect(() => {
-    console.log(state);
+    if (!state?.isAuthenticated) {
+      return;
+    }
+
+    setButtonText('My Kfone');
   }, [state.isAuthenticated]);
 
   const handleNavMenuButton = () => {
@@ -34,7 +39,11 @@ const Navbar = (props) => {
       </div>
       <ul className="flex justify-end items-center">
         <li className="px-4">
-          <RoundedIconButton handleLogin={handleLogin} icon={<AiOutlineLogin />} text="Sign in" />
+          <RoundedIconButton
+            handleLogin={handleLogin}
+            icon={<AiOutlineLogin />}
+            text={buttonText}
+          />
         </li>
         <li onClick={handleNavMenuButton} className="text-secondary block md:hidden">
           {mobileNavOpen ? <GrClose size={24} /> : <HiMenuAlt3 size={24} />}

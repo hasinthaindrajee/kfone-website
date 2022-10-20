@@ -5,7 +5,11 @@ const PrimaryButton = (props) => {
 
   return (
     <button
-      className={`transition ease-in-out duration-300 rounded-lg px-4 py-2 bg-primary text-light hover:bg-secondary-600 flex items-center ${styles}`}
+      className={
+        disabled
+          ? `bg-slate-200 text-slate-400 rounded-lg px-4 py-2 ${styles} cursor-wait`
+          : `transition ease-in-out duration-300 rounded-lg px-4 py-2 bg-primary text-light hover:bg-secondary-600 flex items-center ${styles}`
+      }
       onClick={onClick}
       disabled={disabled}>
       {startIcon}

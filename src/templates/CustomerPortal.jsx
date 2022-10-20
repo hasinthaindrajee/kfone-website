@@ -11,17 +11,19 @@ import {
   AiOutlineCreditCard
 } from 'react-icons/ai';
 import { FiExternalLink } from 'react-icons/fi';
+import Loading from '../layouts/Loading';
+import Config from '../config.json';
 
 const CustomerPortal = ({ children }) => {
   const location = useLocation();
   const history = useHistory();
-  const { signOut } = useAuthContext();
+  const { state, signOut } = useAuthContext();
+  const { isAuthenticated, isLoading } = state;
 
   const handleLogout = () => {
-    signOut().then(() => {
-      sessionStorage.removeItem('verified');
-      sessionStorage.removeItem('otp');
-    });
+    sessionStorage.removeItem('verified');
+    sessionStorage.removeItem('otp');
+    signOut();
   };
 
   const NavLinkBlock = (props) => {
@@ -38,6 +40,10 @@ const CustomerPortal = ({ children }) => {
       </div>
     );
   };
+
+  if (isLoading || !isAuthenticated) {
+    return <Loading />;
+  }
 
   return (
     <div className="font-body">
@@ -86,10 +92,7 @@ const CustomerPortal = ({ children }) => {
           </button>
         </NavLinkBlock>
         <NavLinkBlock url="">
-          <a
-            href="https://kubecon-c46dd.web.app/"
-            target="blank"
-            className="flex w-full items-center">
+          <a href={Config.myaccount} target="blank" className="flex w-full items-center">
             <AiOutlineUser size={28} className="mr-3" />
             <div className="flex w-full items-start">
               <h3 className="mr-1">My Account</h3>
@@ -104,7 +107,7 @@ const CustomerPortal = ({ children }) => {
           </button>
         </NavLinkBlock>
       </nav>
-      <main className="ml-[300px] my-4 px-4 bg-white overflow-y-auto">{children}</main>
+      <main className="ml-[300px] overflow-y-auto bg-gray-100 p-4">{children}</main>
     </div>
   );
 };

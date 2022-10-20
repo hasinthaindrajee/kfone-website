@@ -1,48 +1,31 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthContext } from '@asgardeo/auth-react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import CustomerPortal from '../../templates/CustomerPortal';
-import { initiatePhoneVerify } from '../../api';
-import { BsBookmarkStar, BsCheck } from 'react-icons/bs';
+import { BsCheck } from 'react-icons/bs';
+import avatar from '../../assets/images/people/user.png';
+import { getUsageData, getPackageRecommendation } from '../../api';
+import { getMonthString } from '../../utils';
+import { SectionLoader as Loader } from './SectionLoader';
 
 const currentYear = new Date().getFullYear();
 
+const currency = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0
+});
+
 const MyPlan = () => {
   const history = useHistory();
-  const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const reRenderCheckRef = useRef(false);
-  const {
-    state,
-    httpRequest,
-    signIn,
-    getBasicUserInfo,
-    getIDToken,
-    getDecodedIDToken,
-    getDecodedIDPIDToken
-  } = useAuthContext();
+  const { state, getBasicUserInfo, getIDToken, getDecodedIDToken, httpRequest } = useAuthContext();
 
+  const [loading, setLoading] = useState(true);
+  const [currentPlan, setCurrentPlan] = useState();
+  const [usage, setUsage] = useState();
+  const [currentUsage, setCurrentUsage] = useState();
   const [decodedIDTokenPayload, setDecodedIDTokenPayload] = useState();
-
-  useEffect(() => {
-    reRenderCheckRef.current = true;
-
-    (async () => {
-      try {
-        const now = Math.floor(Date.now() / 1000);
-        const decodedIDtoken = await getDecodedIDPIDToken();
-        const expiration = decodedIDtoken?.exp;
-        if (now < expiration && !query.get('code')) {
-          await signIn();
-        }
-      } catch (error) {
-        console.log(error);
-        if (error?.code === 'SPA-AUTH_CLIENT-VM-IV02' && !query.get('code')) {
-          await signIn();
-        }
-      }
-    })();
-  }, []);
+  const [recommendation, setRecommendation] = useState();
 
   useEffect(() => {
     if (!state?.isAuthenticated) {
@@ -76,216 +59,367 @@ const MyPlan = () => {
     }
 
     if (!sessionStorage.getItem('verified')) {
-      handlePhoneVerification(
-        decodedIDTokenPayload.userid,
-        decodedIDTokenPayload.email,
-        decodedIDTokenPayload.phone_number
-      ).then(() => {
-        history.push('/my-kfone/verify', decodedIDTokenPayload);
-      });
+      history.push('/my-kfone/verify', decodedIDTokenPayload);
+      return;
     }
+
+    getUsageData(decodedIDTokenPayload?.userid || decodedIDTokenPayload?.sub, httpRequest)
+      .then((data) => {
+        setCurrentPlan(data?.data?.subscription);
+        setUsage(data?.data?.usage?.reverse());
+        data?.data?.usage?.length > 0 && setCurrentUsage(data?.data?.usage[0]);
+      })
+      .catch(() => {
+        const data = {
+          userId: '4f833566-6758-4f5a-b43f-31d7d9b0b87f',
+          subscription: {
+            id: 2,
+            price: 120,
+            connectionType: 'postpaid',
+            freeCallMinutes: 150,
+            freeDataGB: 60,
+            name: 'Kfone Lite'
+          },
+          usage: [
+            {
+              month: 10,
+              year: 2022,
+              allocatedMinutesUsage: 0,
+              allocatedDataUsage: 0,
+              additionalPurchases: []
+            }
+          ]
+        };
+
+        setCurrentPlan(data?.subscription);
+        setUsage(data?.usage);
+        data?.usage?.length > 0 && setCurrentUsage(data?.usage[data?.usage?.length - 1]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    getPackageRecommendation(
+      decodedIDTokenPayload?.userid || decodedIDTokenPayload?.sub,
+      httpRequest
+    )
+      .then((data) => {
+        setRecommendation(data.recommendation);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [decodedIDTokenPayload]);
 
-  const handlePhoneVerification = async (userid, email, phone_number) => {
-    const res = await initiatePhoneVerify(userid, email, phone_number, httpRequest);
-    sessionStorage.setItem('otp', res.otp);
+  const renderPlanRecommendation = (recommendation) => {
+    if (!recommendation) {
+      return null;
+    }
+
+    return (
+      <div
+        id="alert-additional-content-5"
+        className="bg-blue-100 p-4 border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700"
+        role="alert">
+        <div className="flex items-center">
+          <svg
+            aria-hidden="true"
+            className="w-5 h-5 mr-2 text-gray-700 dark:text-gray-300"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clipRule="evenodd"></path>
+          </svg>
+          <span className="sr-only">Info</span>
+          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            It&apos;s time to upgrade!
+          </h3>
+        </div>
+        <div className="mt-2 mb-4 text-sm text-gray-700 dark:text-gray-300">
+          We believe that you could benefit from a plan upgrade since you&apos;ve exceeded the
+          existing plan thresholds continuously during past couple of months.
+        </div>
+        <div>
+          <span className="font-small">
+            We recommend the following {recommendation.name} package:
+          </span>
+          <ul className="mt-1.5 ml-4 text-gray-500 list-disc list-inside text-sm">
+            <li>Free Talk Time Minutes: {recommendation.freeCallMinutes}</li>
+            <li>Free Data: {recommendation.freeDataGB} GB</li>
+            <li>Connection Type: {recommendation.connectionType}</li>
+            <li>Price: {currency.format(recommendation.price)}</li>
+          </ul>
+        </div>
+        <div className="flex mt-6">
+          <button
+            type="button"
+            className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium text-sm rounded-lg px-3 py-1.5 mr-2 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-600">
+            Upgrade
+          </button>
+        </div>
+      </div>
+    );
   };
 
-  return (
-    <CustomerPortal>
-      <section className="flex flex-col items-start justify-start">
-        <div className="flex items-center justify-end w-full">
-          <div className="flex flex-col items-center justify-center bg-primary-100 p-4 mx-2 rounded-full h-20 w-20 shadow">
-            <h1 className="text-light font-semibold text-5xl uppercase">
-              {decodedIDTokenPayload?.username.substring(0, 1)}
-            </h1>
-          </div>
-          <div className="px-4 py-2 bg-light rounded-lg shadow">
-            <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.username}</h2>
-            <h2 className="text-sm font-light text-primary-900">
-              {decodedIDTokenPayload?.phone_number}
-            </h2>
-          </div>
+  const renderPlanContent = () => (
+    <>
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:gap-4 my-4">
+        <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
+          <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">My Plan</h3>
+          {currentPlan ? (
+            <>
+              <div className="p-4">
+                <div className="flex items-baseline font-light w-full">
+                  <h1 className="text-4xl text-primary">{currentPlan?.name}</h1>
+                  <h6 className="mx-2 py-1 px-2 bg-primary text-light rounded-lg text-[8px]">
+                    {currentPlan?.connectionType}
+                  </h6>
+                </div>
+                <table className="items-center bg-transparent border-collapse w-full">
+                  <tbody className="divide-y divide-gray-100">
+                    <tr className="text-gray-500">
+                      <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                        <BsCheck className="inline text-emerald-400 mr-2" size={24} />
+                        {currentPlan?.freeDataGB} GB, high speed anytime data
+                      </th>
+                    </tr>
+                    <tr className="text-gray-500">
+                      <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                        <BsCheck className="inline text-emerald-400 mr-2" size={24} />
+                        {currentPlan?.freeCallMinutes} minutes of standard national calls
+                      </th>
+                    </tr>
+                    <tr className="text-gray-500">
+                      <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                        <BsCheck className="inline text-emerald-400 mr-2" size={24} />
+                        Monthly plan charge {currency.format(currentPlan?.price)}
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {renderPlanRecommendation(recommendation)}
+            </>
+          ) : (
+            <Loader />
+          )}
         </div>
-        <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
-            <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">My Plan</h3>
-            <div className="border rounded-lg p-4">
-              <h1 className="flex items-center font-light text-xl text-primary">
-                <BsBookmarkStar className="text-primary-200 mr-2" size={32} />
-                Kfone Emerald Plan
-              </h1>
-              <table className="items-center bg-transparent border-collapse w-full">
-                <tbody className="divide-y divide-gray-100">
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      <BsCheck className="inline text-emerald-400 mr-2" size={24} />
-                      100 GB max speed data
-                    </th>
-                  </tr>
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      <BsCheck className="inline text-emerald-400 mr-2" size={24} />
-                      1000 minutes of standard national calls
-                    </th>
-                  </tr>
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      <BsCheck className="inline text-emerald-400 mr-2" size={24} />
-                      Unlimited text
-                    </th>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
-            <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
-              Buy Data Addons & Subscriptions
-            </h3>
-            <table className="items-center w-full bg-transparent border-collapse">
-              <tbody className="divide-y divide-gray-100">
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Data
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    5,649
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">30%</span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-cyan-600 h-2 rounded-sm"
-                            style={{ width: '30%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Talk
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    4,025
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">24%</span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-orange-300 h-2 rounded-sm"
-                            style={{ width: '24%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="text-gray-500">
-                  <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                    Text
-                  </th>
-                  <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                    3,105
-                  </td>
-                  <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                    <div className="flex items-center">
-                      <span className="mr-2 text-xs font-medium">18%</span>
-                      <div className="relative w-full">
-                        <div className="w-full bg-gray-200 rounded-sm h-2">
-                          <div
-                            className="bg-teal-400 h-2 rounded-sm"
-                            style={{ width: '18%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
-            <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
-              Current Usage
-              <span className="text-sm font-light">
-                &nbsp; as of {new Date().toLocaleString('en-US')}
-              </span>
-            </h3>
+        <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
+          <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
+            Current Usage
+            <span className="text-sm font-light">
+              &nbsp; as of {new Date().toLocaleString('en-US')}
+            </span>
+          </h3>
+          {currentUsage ? (
             <div className="block w-full overflow-x-auto">
               <table className="items-center w-full bg-transparent border-collapse">
-                {/* <thead>
-                  <tr>
-                    <th className="px-4 bg-gray-50 text-gray-700 align-middle py-3 text-xs font-semibold text-left uppercase border-l-0 border-r-0 whitespace-nowrap">
-                      Top Channels
-                    </th>
-                    <th className="px-4 bg-gray-50 text-gray-700 align-middle py-3 text-xs font-semibold text-left uppercase border-l-0 border-r-0 whitespace-nowrap">
-                      Users
-                    </th>
-                    <th className="px-4 bg-gray-50 text-gray-700 align-middle py-3 text-xs font-semibold text-left uppercase border-l-0 border-r-0 whitespace-nowrap min-w-140-px"></th>
-                  </tr>
-                </thead> */}
                 <tbody className="divide-y divide-gray-100">
                   <tr className="text-gray-500">
                     <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Data
+                      Data Bundle
                     </th>
                     <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      5,649
+                      {Number(currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage)} GB
+                      remaining
                     </td>
                     <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
                       <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">30%</span>
+                        <span className="mr-2 text-xs font-medium">
+                          {currentPlan?.freeDataGB !== 0
+                            ? Number(
+                                (
+                                  ((currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage) /
+                                    currentPlan?.freeDataGB) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0}
+                          %
+                        </span>
                         <div className="relative w-full">
                           <div className="w-full bg-gray-200 rounded-sm h-2">
                             <div
                               className="bg-primary-100 h-2 rounded-sm"
-                              style={{ width: '30%' }}></div>
+                              style={{
+                                width: `${
+                                  currentPlan?.freeDataGB !== 0
+                                    ? Number(
+                                        (
+                                          ((currentPlan?.freeDataGB -
+                                            currentUsage?.allocatedDataUsage) /
+                                            currentPlan?.freeDataGB) *
+                                          100
+                                        ).toFixed()
+                                      )
+                                    : 0
+                                }%`
+                              }}></div>
                           </div>
                         </div>
                       </div>
                     </td>
                   </tr>
+
                   <tr className="text-gray-500">
                     <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Talk
+                      Additional Data
                     </th>
                     <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      4,025
+                      {currentUsage?.additionalPurchases?.length > 0
+                        ? currentUsage?.additionalPurchases[0].additionalData -
+                          currentUsage?.additionalPurchases[0].additionalDataUsage
+                        : 0}{' '}
+                      GB remaining
                     </td>
                     <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
                       <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">24%</span>
+                        <span className="mr-2 text-xs font-medium">
+                          {currentUsage?.additionalPurchases?.length > 0
+                            ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                              ? Number(
+                                  (
+                                    ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                      currentUsage?.additionalPurchases[0]?.additionalDataUsage) /
+                                      currentUsage?.additionalPurchases[0]?.additionalData) *
+                                    100
+                                  ).toFixed()
+                                )
+                              : 0
+                            : 0}
+                          %
+                        </span>
                         <div className="relative w-full">
                           <div className="w-full bg-gray-200 rounded-sm h-2">
                             <div
                               className="bg-primary-100 h-2 rounded-sm"
-                              style={{ width: '24%' }}></div>
+                              style={{
+                                width: `${
+                                  currentUsage?.additionalPurchases?.length > 0
+                                    ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                                      ? Number(
+                                          (
+                                            ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalDataUsage) /
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalData) *
+                                            100
+                                          ).toFixed()
+                                        )
+                                      : 0
+                                    : 0
+                                }%`
+                              }}></div>
                           </div>
                         </div>
                       </div>
                     </td>
                   </tr>
+
                   <tr className="text-gray-500">
                     <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Text
+                      Talk Time
                     </th>
                     <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      3,105
+                      {`${
+                        currentPlan?.freeCallMinutes - currentUsage?.allocatedMinutesUsage
+                      } Mins remaining`}
                     </td>
                     <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
                       <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">18%</span>
+                        <span className="mr-2 text-xs font-medium">
+                          {currentUsage?.freeCallMinutes !== 0
+                            ? Number(
+                                (
+                                  ((currentPlan?.freeCallMinutes -
+                                    currentUsage?.allocatedMinutesUsage) /
+                                    currentPlan?.freeCallMinutes) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0}
+                          %
+                        </span>
                         <div className="relative w-full">
                           <div className="w-full bg-gray-200 rounded-sm h-2">
                             <div
                               className="bg-primary-100 h-2 rounded-sm"
-                              style={{ width: '18%' }}></div>
+                              style={{
+                                width: `${
+                                  currentUsage?.freeCallMinutes !== 0
+                                    ? Number(
+                                        (
+                                          ((currentPlan?.freeCallMinutes -
+                                            currentUsage?.allocatedMinutesUsage) /
+                                            currentPlan?.freeCallMinutes) *
+                                          100
+                                        ).toFixed()
+                                      )
+                                    : 0
+                                }%`
+                              }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr className="text-gray-500">
+                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                      Additional Talk Time
+                    </th>
+                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
+                      {currentUsage?.additionalPurchases?.length > 0
+                        ? currentUsage?.additionalPurchases[0].additionalMinutes -
+                          currentUsage?.additionalPurchases[0].additionalMinutesUsage
+                        : 0}{' '}
+                      Mins remaining
+                    </td>
+                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
+                      <div className="flex items-center">
+                        <span className="mr-2 text-xs font-medium">
+                          {currentUsage?.additionalPurchases?.length > 0
+                            ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                              ? Number(
+                                  (
+                                    ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
+                                      currentUsage?.additionalPurchases[0]
+                                        ?.additionalMinutesUsage) /
+                                      currentUsage?.additionalPurchases[0]?.additionalMinutes) *
+                                    100
+                                  ).toFixed()
+                                )
+                              : 0
+                            : 0}
+                          %
+                        </span>
+                        <div className="relative w-full">
+                          <div className="w-full bg-gray-200 rounded-sm h-2">
+                            <div
+                              className="bg-primary-100 h-2 rounded-sm"
+                              style={{
+                                width: `${
+                                  currentUsage?.additionalPurchases?.length > 0
+                                    ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                                      ? Number(
+                                          (
+                                            ((currentUsage?.additionalPurchases[0]
+                                              ?.additionalMinutes -
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalMinutesUsage) /
+                                              currentUsage?.additionalPurchases[0]
+                                                ?.additionalMinutes) *
+                                            100
+                                          ).toFixed()
+                                        )
+                                      : 0
+                                    : 0
+                                }%`
+                              }}></div>
                           </div>
                         </div>
                       </div>
@@ -294,79 +428,20 @@ const MyPlan = () => {
                 </tbody>
               </table>
             </div>
-          </div>
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Recent Payments</h3>
-              </div>
-              <div className="flex-shrink-0">
-                <a
-                  href="#"
-                  className="text-sm font-medium text-primary hover:underline rounded-lg p-2">
-                  View all
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col mt-8">
-              <div className="overflow-x-auto rounded-lg">
-                <div className="align-middle inline-block min-w-full">
-                  <div className="shadow overflow-hidden sm:rounded-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th
-                            scope="col"
-                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date & Time
-                          </th>
-                          <th
-                            scope="col"
-                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Amount
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white">
-                        <tr>
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            Aug 23 ,{currentYear}
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            $590
-                          </td>
-                        </tr>
-                        <tr className="bg-gray-50">
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            Jul 20 ,{currentYear}
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            $2300
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            May 18 ,{currentYear}
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            $234
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          ) : (
+            <Loader />
+          )}
         </div>
-        <div className="w-full grid grid-cols-1 xl:gap-4 my-4">
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Usage History</h3>
-              </div>
+      </div>
+
+      <div className="w-full grid grid-cols-1 xl:gap-4 my-4">
+        <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Usage History</h3>
             </div>
+          </div>
+          {usage ? (
             <div className="flex flex-col mt-8">
               <div className="overflow-x-auto rounded-lg">
                 <div className="align-middle inline-block min-w-full">
@@ -382,134 +457,214 @@ const MyPlan = () => {
                           <th
                             scope="col"
                             className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Usage
+                            Data Usage
                           </th>
                           <th
                             scope="col"
                             className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Additional Purchases & Usage
+                            Talk Time Usage
+                          </th>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Additional Data Purchases
+                          </th>
+                          <th
+                            scope="col"
+                            className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Additional Talk Time Purchases
                           </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white">
-                        <tr>
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            September 2022
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            100.0GB
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            10.0GB/10.0GB
-                          </td>
-                        </tr>
-                        <tr className="bg-gray-50">
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            August 2022
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            100.0GB
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            <span className="bg-light rounded border border-secondary-50 inline-block p-1 mr-1">
-                              10.0GB/10.0GB
-                            </span>
-                            <span className="bg-light rounded border border-secondary-50 inline-block p-1">
-                              8.0GB/10.0GB
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
-                            July 2022
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            100.0GB
-                          </td>
-                          <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            10.0GB/10.0GB
-                          </td>
-                        </tr>
+                        {usage?.map((el, key) => (
+                          <tr key={key}>
+                            <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
+                              {getMonthString(el?.month)}&nbsp;{el?.year}
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.allocatedDataUsage} GB
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.allocatedMinutesUsage} Mins
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.additionalPurchases?.length > 0 ? (
+                                el?.additionalPurchases?.map((el2, subKey) => (
+                                  <span
+                                    key={subKey}
+                                    className="bg-light rounded border border-secondary-50 inline-block p-1 mr-1">
+                                    {`${el2.additionalData} GB`}
+                                  </span>
+                                ))
+                              ) : (
+                                <span>-</span>
+                              )}
+                            </td>
+                            <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                              {el?.additionalPurchases?.length > 0 ? (
+                                el?.additionalPurchases?.map((el2, subKey) =>
+                                  el2?.additionalMinutes === 0 ? (
+                                    <span>-</span>
+                                  ) : (
+                                    <span
+                                      key={subKey}
+                                      className="bg-light rounded border border-secondary-50 inline-block p-1 mr-1">
+                                      {`${el2.additionalMinutes} Mins`}
+                                    </span>
+                                  )
+                                )
+                              ) : (
+                                <span>-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <Loader />
+          )}
         </div>
-        <div className="w-full grid grid-cols-1 xl:grid-cols-3 xl:gap-4 my-4">
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex-shrink-0">
-                <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
-                  $45,385
-                </span>
-                <h3 className="text-base font-normal text-gray-500">Sales this week</h3>
-              </div>
-              <div className="flex items-center justify-end flex-1 text-green-500 text-base font-bold">
-                12.5%
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"></path>
-                </svg>
-              </div>
+      </div>
+      <div className="w-full grid grid-cols-1 xl:grid-cols-2 xl:gap-4 my-4">
+        <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Recent Payments</h3>
             </div>
-            <div id="main-chart"></div>
-          </div>
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
-                  2,340
-                </span>
-                <h3 className="text-base font-normal text-gray-500">New products this week</h3>
-              </div>
-              <div className="ml-5 w-0 flex items-center justify-end flex-1 text-green-500 text-base font-bold">
-                14.6%
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"></path>
-                </svg>
-              </div>
+            <div className="flex-shrink-0">
+              <a
+                href="#"
+                className="text-sm font-medium text-primary hover:underline rounded-lg p-2">
+                View all
+              </a>
             </div>
           </div>
-          <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
-                  5,355
-                </span>
-                <h3 className="text-base font-normal text-gray-500">Visitors this week</h3>
-              </div>
-              <div className="ml-5 w-0 flex items-center justify-end flex-1 text-green-500 text-base font-bold">
-                32.9%
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z"
-                    clipRule="evenodd"></path>
-                </svg>
+          <div className="flex flex-col mt-8">
+            <div className="overflow-x-auto rounded-lg">
+              <div className="align-middle inline-block min-w-full">
+                <div className="shadow overflow-hidden sm:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date & Time
+                        </th>
+                        <th
+                          scope="col"
+                          className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      <tr>
+                        <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
+                          Aug 23 ,{currentYear}
+                        </td>
+                        <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                          $590
+                        </td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
+                          Jul 20 ,{currentYear}
+                        </td>
+                        <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                          $2300
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-4 whitespace-nowrap text-sm font-normal text-gray-500">
+                          May 18 ,{currentYear}
+                        </td>
+                        <td className="p-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                          $234
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
+          <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
+            Buy Data Addons & Subscriptions
+          </h3>
+          <table className="items-center w-full bg-transparent border-collapse">
+            <tbody className="divide-y divide-gray-100">
+              <tr className="text-gray-500">
+                <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                  Additional data purchase
+                </th>
+              </tr>
+              <tr className="text-gray-500">
+                <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                  Buy data addons
+                </th>
+              </tr>
+              <tr className="text-gray-500">
+                <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
+                  Kfone Flex TV subscriptions
+                </th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <CustomerPortal>
+      <section className="flex flex-col items-start justify-start">
+        <div className="flex items-center justify-end w-full">
+          <div className="flex flex-col items-center justify-center mx-4 rounded-full h-[60px] w-[60px] shadow">
+            <img src={avatar} alt="user avatar" height={60} />
+          </div>
+          <div className="px-4 py-2 bg-light rounded-lg shadow">
+            <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.email}</h2>
+            <h2 className="text-sm font-light text-primary-900">
+              {decodedIDTokenPayload?.phone_number}
+            </h2>
+          </div>
+        </div>
+        {loading ? (
+          <div className="content-spinner-wrapper w-full">
+            <div className="animate-pulse flex justify-center h-screen w-full items-center">
+              <div className="text-center">
+                <div role="status">
+                  <svg
+                    className="inline mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          renderPlanContent()
+        )}
       </section>
     </CustomerPortal>
   );
