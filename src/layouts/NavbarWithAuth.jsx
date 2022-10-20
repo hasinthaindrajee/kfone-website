@@ -5,9 +5,11 @@ import { GiCrossedAirFlows } from 'react-icons/gi';
 import { GrClose } from 'react-icons/gr';
 import RoundedIconButton from '../components/buttons/RoundedIconButton';
 import { useAuthContext } from '@asgardeo/auth-react';
+import { useHistory } from 'react-router-dom';
 
 const NavbarWithAuth = (props) => {
   const { state } = useAuthContext();
+  const history = useHistory();
   const { handleLogin } = props;
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -42,7 +44,14 @@ const NavbarWithAuth = (props) => {
       <ul className="flex justify-end items-center">
         <li className="px-4">
           <RoundedIconButton
-            handleLogin={handleLogin}
+            handleLogin={() => {
+              if (state?.isAuthenticated) {
+                history.push('/my-kfone');
+                return;
+              }
+
+              handleLogin();
+            }}
             icon={<AiOutlineLogin />}
             text={buttonText}
           />

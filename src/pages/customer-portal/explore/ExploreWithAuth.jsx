@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CustomerPortal from '../../../templates/CustomerPortal';
 import { Carousel } from './Carousel';
 import { MobilePlans } from './MobilePlans';
@@ -10,13 +10,21 @@ import Loading from '../../../layouts/Loading';
 import avatar from '../../../assets/images/people/user.png';
 
 const ExploreWithAuth = (props) => {
-  const { state, getDecodedIDToken } = useAuthContext();
+  const { state, getDecodedIDToken, signIn, trySignInSilently } = useAuthContext();
 
   const [decodedIDTokenPayload, setDecodedIDTokenPayload] = useState();
 
   useEffect(() => {
     if (!state?.isAuthenticated) {
-      return;
+      trySignInSilently()
+        .then((response) => {
+          if (!response) {
+            signIn();
+          }
+        })
+        .catch(() => {
+          signIn();
+        });
     }
 
     (async () => {
@@ -25,7 +33,7 @@ const ExploreWithAuth = (props) => {
     })();
   }, [state.isAuthenticated]);
 
-  if (state?.isLoading || !state?.isAuthenticated) {
+  if (state?.isLoading) {
     return <Loading />;
   }
 
@@ -36,7 +44,7 @@ const ExploreWithAuth = (props) => {
           <img src={avatar} alt="user avatar" height={60} />
         </div>
         <div className="px-4 py-2 bg-light rounded-lg shadow">
-          <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.email}</h2>
+          <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.email || decodedIDTokenPayload?.username }</h2>
           <h2 className="text-sm font-light text-primary-900">
             {decodedIDTokenPayload?.phone_number}
           </h2>
