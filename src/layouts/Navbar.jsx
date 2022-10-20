@@ -17,7 +17,7 @@ const Navbar = (props) => {
     }
 
     setButtonText('My Kfone');
-  }, [state.isAuthenticated]);
+  }, [state?.isAuthenticated]);
 
   const handleNavMenuButton = () => {
     setMobileNavOpen(!mobileNavOpen);

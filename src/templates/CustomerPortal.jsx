@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuthContext } from '@asgardeo/auth-react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { GiCrossedAirFlows } from 'react-icons/gi';
 import {
@@ -16,10 +15,9 @@ import Config from '../config.json';
 const CustomerPortal = ({ children }) => {
   const location = useLocation();
   const history = useHistory();
-  const { signOut } = useAuthContext();
 
   const handleLogout = () => {
-    signOut();
+    return;
   };
 
   const NavLinkBlock = (props) => {
@@ -105,7 +103,7 @@ const CustomerPortal = ({ children }) => {
           </button>
         </NavLinkBlock>
       </nav>
-      <main className="ml-[300px] overflow-y-auto bg-gray-100 p-4">{children}</main>
+      <main className="ml-[300px] overflow-y-auto h-screen bg-gray-100 p-4">{children}</main>
     </div>
   );
 };
