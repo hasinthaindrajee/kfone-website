@@ -3,7 +3,6 @@ import { useAuthContext } from '@asgardeo/auth-react';
 import { useHistory } from 'react-router-dom';
 import CustomerPortal from '../../templates/CustomerPortal';
 import { BsCheck } from 'react-icons/bs';
-import avatar from '../../assets/images/people/user.png';
 import { getUsageData, getPackageRecommendation } from '../../api';
 import { getMonthString } from '../../utils';
 import { SectionLoader as Loader } from './SectionLoader';
@@ -627,17 +626,6 @@ const MyPlan = () => {
   return (
     <CustomerPortal>
       <section className="flex flex-col items-start justify-start">
-        <div className="flex items-center justify-end w-full">
-          <div className="flex flex-col items-center justify-center mx-4 rounded-full h-[60px] w-[60px] shadow">
-            <img src={avatar} alt="user avatar" height={60} />
-          </div>
-          <div className="px-4 py-2 bg-light rounded-lg shadow">
-            <h2 className="text-xl font-light text-primary">{decodedIDTokenPayload?.email}</h2>
-            <h2 className="text-sm font-light text-primary-900">
-              {decodedIDTokenPayload?.phone_number}
-            </h2>
-          </div>
-        </div>
         {loading ? (
           <div className="content-spinner-wrapper w-full">
             <div className="animate-pulse flex justify-center h-screen w-full items-center">
