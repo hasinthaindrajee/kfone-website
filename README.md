@@ -21,7 +21,7 @@ git clone https://github.com/chaminjay/kfone-website
 cd kfone-website
 ```
 
-Go to src/config.json and change the `signInRedirectURL` and `signOutRedirectURL` as below for to run the application locally.
+Go to src/config.json and change the `signInRedirectURL` and `signOutRedirectURL` as below, to run the application locally.
 
 ```json
 "signInRedirectURL": "https://localhost:3001/my-kfone",
