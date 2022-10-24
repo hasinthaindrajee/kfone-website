@@ -9,6 +9,7 @@ import NotFoundErrorPage from './pages/404';
 import MyPlan from './pages/customer-portal/MyPlan';
 import Discover from './pages/customer-portal/explore/Explore';
 import { SecureRouteWithRedirect } from './components';
+import BusinessPage from './pages/BusinessPage';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       <Router>
         <Switch>
           <Route exact path="/" component={HomePage} />
+          <Route exact path="/enterprise" component={BusinessPage} />
           <SecureRouteWithRedirect exact path="/my-kfone" component={MyPlan} />
           <SecureRouteWithRedirect exact path="/my-kfone/explore" component={Discover} />
           <SecureRouteWithRedirect exact path="/my-kfone/verify" component={PhoneVerification} />

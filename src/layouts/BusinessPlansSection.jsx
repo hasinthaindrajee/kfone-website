@@ -1,6 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import HeaderTitle from '../components/headers/HeaderTitle';
-import PrimaryButton from '../components/buttons/PrimaryButton';
 import office_people from '../assets/images/people/office_people.jpg';
 import { RiSignalTowerFill, RiPieChart2Line } from 'react-icons/ri';
 import { BsHddNetwork, BsCloud, BsPeople, BsArrowRightShort } from 'react-icons/bs';
@@ -75,7 +75,12 @@ const BusinessPlansSection = () => {
           </ul>
         </div>
         <div>
-          <PrimaryButton text={'Learn More'} endIcon={<BsArrowRightShort size={28} />} />
+          <Link
+            to="/enterprise"
+            className="transition ease-in-out duration-300 rounded-lg px-4 py-2 bg-primary text-light hover:bg-secondary-600 flex w-[150px] items-center">
+            Learn more
+            <BsArrowRightShort size={28} />
+          </Link>
         </div>
       </div>
       <div className="flex items-center justify-center">
