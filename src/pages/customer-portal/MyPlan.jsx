@@ -25,6 +25,9 @@ const MyPlan = () => {
   const [currentUsage, setCurrentUsage] = useState();
   const [decodedIDTokenPayload, setDecodedIDTokenPayload] = useState();
   const [recommendation, setRecommendation] = useState();
+  const [activeDataTab, setActiveDataTab] = useState(1);
+  const [activeTalkTab, setActiveTalkTab] = useState(1);
+  const [activeUsageTab, setActiveUsageTab] = useState(1);
 
   useEffect(() => {
     if (!state?.isAuthenticated) {
@@ -207,77 +210,68 @@ const MyPlan = () => {
           )}
         </div>
         <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8">
-          <h3 className="text-xl leading-none font-bold text-gray-900 mb-10">
-            Current Usage
-            <span className="text-sm font-light">
-              &nbsp; as of {new Date().toLocaleString('en-US')}
-            </span>
-          </h3>
-          {currentUsage ? (
-            <div className="block w-full overflow-x-auto">
-              <table className="items-center w-full bg-transparent border-collapse">
-                <tbody className="divide-y divide-gray-100">
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Data Bundle
-                    </th>
-                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      {Number(currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage)} GB
-                      remaining
-                    </td>
-                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">
-                          {currentPlan?.freeDataGB !== 0
-                            ? Number(
-                                (
-                                  ((currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage) /
-                                    currentPlan?.freeDataGB) *
-                                  100
-                                ).toFixed()
-                              )
-                            : 0}
-                          %
-                        </span>
-                        <div className="relative w-full">
-                          <div className="w-full bg-gray-200 rounded-sm h-2">
-                            <div
-                              className="bg-primary-100 h-2 rounded-sm"
-                              style={{
-                                width: `${
-                                  currentPlan?.freeDataGB !== 0
-                                    ? Number(
-                                        (
-                                          ((currentPlan?.freeDataGB -
-                                            currentUsage?.allocatedDataUsage) /
-                                            currentPlan?.freeDataGB) *
-                                          100
-                                        ).toFixed()
-                                      )
-                                    : 0
-                                }%`
-                              }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Additional Data
-                    </th>
-                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      {currentUsage?.additionalPurchases?.length > 0
-                        ? currentUsage?.additionalPurchases[0].additionalData -
-                          currentUsage?.additionalPurchases[0].additionalDataUsage
-                        : 0}{' '}
-                      GB remaining
-                    </td>
-                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">
-                          {currentUsage?.additionalPurchases?.length > 0
+          <div id="usage-main-tab" className="tabs">
+            <button
+              className={`tab tab-bordered w-[50%] ${activeUsageTab === 1 ? 'tab-active' : ''}`}
+              onClick={() => handleUsageTabNav(1)}>
+              <span
+                className={`text-xl font-bold${
+                  activeUsageTab === 1 ? 'text-black' : 'text-slate-400'
+                }`}>
+                Data Usage
+              </span>
+            </button>
+            <button
+              className={`tab tab-bordered w-[50%] ${activeUsageTab === 2 ? 'tab-active' : ''}`}
+              onClick={() => handleUsageTabNav(2)}>
+              <span
+                className={`text-xl font-bold${
+                  activeUsageTab === 2 ? 'text-black' : 'text-slate-400'
+                }`}>
+                Talk Time Usage
+              </span>
+            </button>
+          </div>
+          {activeUsageTab === 1 ? (
+            <div className="p-4 sm:p-6 xl:p-8 h-full">
+              {currentUsage ? (
+                <>
+                  <div id="data-tab" className="tabs tabs-boxed">
+                    <button
+                      className={`tab w-[50%] ${
+                        activeDataTab === 1 ? 'tab-active bg-teal-500' : ''
+                      }`}
+                      onClick={() => handleDataTabNav(1)}>
+                      <span className={`text-sm ${activeDataTab === 1 ? 'text-light' : ''}`}>
+                        Data Bundle
+                      </span>
+                    </button>
+                    <button
+                      className={`tab w-[50%] ${
+                        activeDataTab === 2 ? 'tab-active bg-teal-500' : ''
+                      }`}
+                      onClick={() => handleDataTabNav(2)}>
+                      <span className={`text-sm ${activeDataTab === 2 ? 'text-light' : ''}`}>
+                        Additional Data
+                      </span>
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center justify-evenly p-4 lg:p-8 space-y-4  h-full">
+                    <div
+                      className="radial-progress text-teal-400 shadow-md"
+                      style={{
+                        '--value': `${
+                          activeDataTab === 1
+                            ? currentPlan?.freeDataGB !== 0
+                              ? Number(
+                                  (
+                                    ((currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage) /
+                                      currentPlan?.freeDataGB) *
+                                    100
+                                  ).toFixed()
+                                )
+                              : 0
+                            : currentUsage?.additionalPurchases?.length > 0
                             ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
                               ? Number(
                                   (
@@ -288,100 +282,106 @@ const MyPlan = () => {
                                   ).toFixed()
                                 )
                               : 0
-                            : 0}
-                          %
-                        </span>
-                        <div className="relative w-full">
-                          <div className="w-full bg-gray-200 rounded-sm h-2">
-                            <div
-                              className="bg-primary-100 h-2 rounded-sm"
-                              style={{
-                                width: `${
-                                  currentUsage?.additionalPurchases?.length > 0
-                                    ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
-                                      ? Number(
-                                          (
-                                            ((currentUsage?.additionalPurchases[0]?.additionalData -
-                                              currentUsage?.additionalPurchases[0]
-                                                ?.additionalDataUsage) /
-                                              currentUsage?.additionalPurchases[0]
-                                                ?.additionalData) *
-                                            100
-                                          ).toFixed()
-                                        )
-                                      : 0
-                                    : 0
-                                }%`
-                              }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Talk Time
-                    </th>
-                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      {`${
-                        currentPlan?.freeCallMinutes - currentUsage?.allocatedMinutesUsage
-                      } Mins remaining`}
-                    </td>
-                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">
-                          {currentUsage?.freeCallMinutes !== 0
+                            : 0
+                        }`,
+                        '--size': '12rem',
+                        '--thickness': '1rem'
+                      }}>
+                      <span className="text-4xl font-extralight text-slate-500">
+                        {activeDataTab === 1
+                          ? currentPlan?.freeDataGB !== 0
                             ? Number(
                                 (
-                                  ((currentPlan?.freeCallMinutes -
-                                    currentUsage?.allocatedMinutesUsage) /
-                                    currentPlan?.freeCallMinutes) *
+                                  ((currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage) /
+                                    currentPlan?.freeDataGB) *
                                   100
                                 ).toFixed()
                               )
-                            : 0}
-                          %
-                        </span>
-                        <div className="relative w-full">
-                          <div className="w-full bg-gray-200 rounded-sm h-2">
-                            <div
-                              className="bg-primary-100 h-2 rounded-sm"
-                              style={{
-                                width: `${
-                                  currentUsage?.freeCallMinutes !== 0
-                                    ? Number(
-                                        (
-                                          ((currentPlan?.freeCallMinutes -
-                                            currentUsage?.allocatedMinutesUsage) /
-                                            currentPlan?.freeCallMinutes) *
-                                          100
-                                        ).toFixed()
-                                      )
-                                    : 0
-                                }%`
-                              }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+                            : 0
+                          : currentUsage?.additionalPurchases?.length > 0
+                          ? currentUsage?.additionalPurchases[0]?.additionalData !== 0
+                            ? Number(
+                                (
+                                  ((currentUsage?.additionalPurchases[0]?.additionalData -
+                                    currentUsage?.additionalPurchases[0]?.additionalDataUsage) /
+                                    currentUsage?.additionalPurchases[0]?.additionalData) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0
+                          : 0}
+                        %
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xl font-semibold">
+                        {activeDataTab === 1
+                          ? Number(currentPlan?.freeDataGB - currentUsage?.allocatedDataUsage)
+                          : currentUsage?.additionalPurchases?.length > 0
+                          ? currentUsage?.additionalPurchases[0].additionalData -
+                            currentUsage?.additionalPurchases[0].additionalDataUsage
+                          : 0}
+                      </span>
+                      /
+                      {activeDataTab === 1
+                        ? Number(currentPlan?.freeDataGB)
+                        : currentUsage?.additionalPurchases?.length > 0
+                        ? currentUsage?.additionalPurchases[0].additionalData
+                        : 0}
+                      GB remaining
+                      <br />
+                      <span className="text-sm font-light">
+                        as of {new Date().toLocaleString('en-US')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <Loader />
+              )}
+            </div>
+          ) : (
+            <div className="p-4 sm:p-6 xl:p-8 h-full">
+              {currentUsage ? (
+                <>
+                  <div id="talk-tab" className="tabs tabs-boxed">
+                    <button
+                      className={`tab w-[50%] ${
+                        activeTalkTab === 1 ? 'tab-active bg-sky-500' : ''
+                      }`}
+                      onClick={() => handleTalkTabNav(1)}>
+                      <span className={`text-sm ${activeTalkTab === 1 ? 'text-light' : ''}`}>
+                        Talk Time
+                      </span>
+                    </button>
+                    <button
+                      className={`tab w-[50%] ${
+                        activeTalkTab === 2 ? 'tab-active bg-sky-500' : ''
+                      }`}
+                      onClick={() => handleTalkTabNav(2)}>
+                      <span className={`text-sm ${activeTalkTab === 2 ? 'text-light' : ''}`}>
+                        Additional Talk Time
+                      </span>
+                    </button>
+                  </div>
 
-                  <tr className="text-gray-500">
-                    <th className="border-t-0 px-4 align-middle text-sm font-normal whitespace-nowrap p-4 text-left">
-                      Additional Talk Time
-                    </th>
-                    <td className="border-t-0 px-4 align-middle text-xs font-medium text-gray-900 whitespace-nowrap p-4">
-                      {currentUsage?.additionalPurchases?.length > 0
-                        ? currentUsage?.additionalPurchases[0].additionalMinutes -
-                          currentUsage?.additionalPurchases[0].additionalMinutesUsage
-                        : 0}{' '}
-                      Mins remaining
-                    </td>
-                    <td className="border-t-0 px-4 align-middle text-xs whitespace-nowrap p-4">
-                      <div className="flex items-center">
-                        <span className="mr-2 text-xs font-medium">
-                          {currentUsage?.additionalPurchases?.length > 0
+                  <div className="flex flex-col items-center justify-evenly p-4 lg:p-8 space-y-4 h-full">
+                    <div
+                      className="radial-progress text-sky-400 shadow-md"
+                      style={{
+                        '--value': `${
+                          activeTalkTab === 1
+                            ? currentUsage?.freeCallMinutes !== 0
+                              ? Number(
+                                  (
+                                    ((currentPlan?.freeCallMinutes -
+                                      currentUsage?.allocatedMinutesUsage) /
+                                      currentPlan?.freeCallMinutes) *
+                                    100
+                                  ).toFixed()
+                                )
+                              : 0
+                            : currentUsage?.additionalPurchases?.length > 0
                             ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
                               ? Number(
                                   (
@@ -393,42 +393,66 @@ const MyPlan = () => {
                                   ).toFixed()
                                 )
                               : 0
-                            : 0}
-                          %
-                        </span>
-                        <div className="relative w-full">
-                          <div className="w-full bg-gray-200 rounded-sm h-2">
-                            <div
-                              className="bg-primary-100 h-2 rounded-sm"
-                              style={{
-                                width: `${
-                                  currentUsage?.additionalPurchases?.length > 0
-                                    ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
-                                      ? Number(
-                                          (
-                                            ((currentUsage?.additionalPurchases[0]
-                                              ?.additionalMinutes -
-                                              currentUsage?.additionalPurchases[0]
-                                                ?.additionalMinutesUsage) /
-                                              currentUsage?.additionalPurchases[0]
-                                                ?.additionalMinutes) *
-                                            100
-                                          ).toFixed()
-                                        )
-                                      : 0
-                                    : 0
-                                }%`
-                              }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                            : 0
+                        }`,
+                        '--size': '12rem',
+                        '--thickness': '1rem'
+                      }}>
+                      <span className="text-4xl font-extralight text-slate-500">
+                        {activeTalkTab === 1
+                          ? currentUsage?.freeCallMinutes !== 0
+                            ? Number(
+                                (
+                                  ((currentPlan?.freeCallMinutes -
+                                    currentUsage?.allocatedMinutesUsage) /
+                                    currentPlan?.freeCallMinutes) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0
+                          : currentUsage?.additionalPurchases?.length > 0
+                          ? currentUsage?.additionalPurchases[0]?.additionalMinutes !== 0
+                            ? Number(
+                                (
+                                  ((currentUsage?.additionalPurchases[0]?.additionalMinutes -
+                                    currentUsage?.additionalPurchases[0]?.additionalMinutesUsage) /
+                                    currentUsage?.additionalPurchases[0]?.additionalMinutes) *
+                                  100
+                                ).toFixed()
+                              )
+                            : 0
+                          : 0}
+                        %
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xl font-semibold">
+                        {activeTalkTab === 1
+                          ? `${currentPlan?.freeCallMinutes - currentUsage?.allocatedMinutesUsage}`
+                          : currentUsage?.additionalPurchases?.length > 0
+                          ? currentUsage?.additionalPurchases[0].additionalMinutes -
+                            currentUsage?.additionalPurchases[0].additionalMinutesUsage
+                          : 0}
+                        Mins
+                      </span>
+                      /
+                      {activeTalkTab === 1
+                        ? `${currentUsage?.allocatedMinutesUsage}`
+                        : currentUsage?.additionalPurchases?.length > 0
+                        ? currentUsage?.additionalPurchases[0].additionalMinutes
+                        : 0}
+                      Mins remaining
+                      <br />
+                      <span className="text-sm font-light">
+                        as of {new Date().toLocaleString('en-US')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <Loader />
+              )}
             </div>
-          ) : (
-            <Loader />
           )}
         </div>
       </div>
@@ -622,6 +646,16 @@ const MyPlan = () => {
       </div>
     </>
   );
+
+  const handleDataTabNav = (tab) => {
+    setActiveDataTab(tab);
+  };
+  const handleTalkTabNav = (tab) => {
+    setActiveTalkTab(tab);
+  };
+  const handleUsageTabNav = (tab) => {
+    setActiveUsageTab(tab);
+  };
 
   return (
     <CustomerPortal>
