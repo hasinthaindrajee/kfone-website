@@ -29,3 +29,11 @@ html {
 a:hover {
   cursor: pointer;
 }
+
+#talk-tab.tabs-boxed .tab-active {
+  background-color: #0ea5e9;
+}
+
+#data-tab.tabs-boxed .tab-active {
+  background-color: #14b8a6;
+}
