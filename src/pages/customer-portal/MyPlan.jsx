@@ -437,7 +437,7 @@ const MyPlan = () => {
                       </span>
                       /
                       {activeTalkTab === 1
-                        ? `${currentUsage?.allocatedMinutesUsage}`
+                        ? `${currentPlan?.freeCallMinutes}`
                         : currentUsage?.additionalPurchases?.length > 0
                         ? currentUsage?.additionalPurchases[0].additionalMinutes
                         : 0}
