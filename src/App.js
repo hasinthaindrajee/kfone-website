@@ -1,14 +1,18 @@
 import React from 'react';
 import AppRouter from './Router';
+import { useAuthContext } from "@asgardeo/auth-react";
 
 const App = () => {
-  const handleLogin = () => {
-    alert('Login functionality is not yet integrated!');
-  };
+ const { state, signIn, signOut } = useAuthContext();
 
-  const handleLogout = () => {
-    alert('Logout functionality is not yet integrated!');
-  };
+const handleLogin = () => {
+  signIn();
+ };
+
+ const handleLogout = () => {
+   signOut();
+ };
+
 
   return <AppRouter handleLogin={handleLogin} handleLogout={handleLogout} />;
 };
