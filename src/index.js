@@ -13,8 +13,8 @@ const Index = () => (
    config={ {
 	    signInRedirectURL: "https://localhost:3001/my-kfone",
             signOutRedirectURL: "https://localhost:3001/my-kfone",
-            clientID: "tkIiux97G_KcoXMQ5m0_MXS3uNEa",
-            baseUrl: "https://api.asgardeo.io/t/kfone",
+            clientID: "CEDMJLv2QaIN2pdZKxSu1ObCuAMa",
+            baseUrl: "https://api.asgardeo.io/t/hasintha",
             scope: [ "openid","profile" ]
    } }
  >
